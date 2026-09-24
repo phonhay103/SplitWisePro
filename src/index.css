@@ -5,6 +5,10 @@
 @theme {
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Custom intermediate neutrals (Tailwind v4 has no 750/850 by default) */
+  --color-neutral-750: #2e2e2e;
+  --color-neutral-850: #1f1f1f;
 }
 
 /* Ensure all inputs, selects, and textareas respect dark mode with optimal contrast and no white glare */
