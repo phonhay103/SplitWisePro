@@ -6,7 +6,6 @@ import {
   ArrowRightLeft,
   FileText,
   ChevronDown,
-  Globe,
   Edit2,
   Sun,
   Moon,
@@ -15,6 +14,7 @@ import { Group } from '../types';
 import { Language, TRANSLATIONS } from '../utils/i18n';
 import { CURRENCIES } from '../utils/currency';
 import { PWAInstallButton } from './PWAInstallButton';
+import { LanguageDropdown } from './LanguageDropdown';
 
 interface HeaderProps {
   currentGroup: Group;
@@ -22,7 +22,7 @@ interface HeaderProps {
   lang: Language;
   theme: 'light' | 'dark';
   onTabChange: (tab: 'expenses' | 'settlement' | 'members') => void;
-  onToggleLanguage: () => void;
+  onSetLanguage: (lang: Language) => void;
   onToggleTheme: () => void;
   onChangeCurrency: (newCurrency: string) => void;
   onOpenAddExpense: () => void;
@@ -37,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
   lang,
   theme,
   onTabChange,
-  onToggleLanguage,
+  onSetLanguage,
   onToggleTheme,
   onChangeCurrency,
   onOpenAddExpense,
@@ -161,17 +161,8 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          {/* Language Toggle EN / VI */}
-          <button
-            onClick={onToggleLanguage}
-            className="px-2 py-1 text-xs font-bold text-neutral-700 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors flex items-center gap-1.5"
-            title={lang === 'en' ? 'Chuyển sang Tiếng Việt' : 'Switch to English'}
-          >
-            <Globe className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400" />
-            <span className={`text-[11px] font-bold ${lang === 'en' ? 'text-emerald-700 dark:text-emerald-400' : 'text-neutral-400 dark:text-neutral-500'}`}>EN</span>
-            <span className="text-neutral-300 dark:text-neutral-600 text-[10px]">|</span>
-            <span className={`text-[11px] font-bold ${lang === 'vi' ? 'text-emerald-700 dark:text-emerald-400' : 'text-neutral-400 dark:text-neutral-500'}`}>VI</span>
-          </button>
+          {/* Language Selector */}
+          <LanguageDropdown lang={lang} onSelect={onSetLanguage} />
 
           {/* Theme Toggle Light / Dark */}
           <button
@@ -206,7 +197,7 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Plus className="w-4 h-4" />
             <span className="hidden xs:inline">{t.addExpenseBtn}</span>
-            <span className="xs:hidden">{lang === 'vi' ? 'Thêm' : 'Add'}</span>
+            <span className="xs:hidden">{t.addShortBtn}</span>
           </button>
         </div>
       </div>
@@ -247,7 +238,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={onOpenSummaryReport}
           className="flex-1 py-1 text-center font-bold text-emerald-700 dark:text-emerald-400 rounded-md"
         >
-          {lang === 'vi' ? 'Báo cáo' : 'Report'}
+          {t.reportBtn}
         </button>
       </div>
     </header>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Download, Smartphone, Share, PlusSquare, X, CheckCircle2 } from 'lucide-react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
-import { Language } from '../utils/i18n';
+import { Language, TRANSLATIONS } from '../utils/i18n';
 
 interface PWAInstallButtonProps {
   lang: Language;
@@ -11,6 +11,7 @@ interface PWAInstallButtonProps {
 export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({ lang, variant = 'header' }) => {
   const { isInstallable, isInstalled, isIOS, install } = usePWAInstall();
   const [showGuide, setShowGuide] = useState(false);
+  const t = TRANSLATIONS[lang];
 
   // If already running in standalone mode (already installed as PWA), do not render
   if (isInstalled) {
@@ -28,7 +29,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({ lang, varian
     }
   };
 
-  const label = lang === 'vi' ? 'Cài đặt App' : 'Install App';
+  const label = t.installAppBtn;
 
   return (
     <>
@@ -36,7 +37,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({ lang, varian
         <button
           onClick={handleClick}
           className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-300 dark:border-emerald-800 rounded-lg transition-colors shadow-2xs whitespace-nowrap"
-          title={lang === 'vi' ? 'Cài đặt ứng dụng PWA lên điện thoại hoặc máy tính' : 'Install PWA to Home Screen or Desktop'}
+          title={t.installTagline}
         >
           <Download className="w-3.5 h-3.5" />
           <span>{label}</span>
@@ -64,10 +65,10 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({ lang, varian
                 </div>
                 <div>
                   <h3 className="font-bold text-sm">
-                    {lang === 'vi' ? 'Cài đặt SplitWise Pro' : 'Install SplitWise Pro'}
+                    {t.installAppTitle}
                   </h3>
                   <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                    {lang === 'vi' ? 'Chạy mượt như app gốc, offline & lưu trữ bền vững' : 'Native app experience, offline & persistent'}
+                    {t.installTagline}
                   </p>
                 </div>
               </div>
@@ -87,15 +88,11 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({ lang, varian
                       1
                     </span>
                     <div>
-                      {lang === 'vi' ? (
-                        <span>
-                          Nhấn nút <strong>Chia sẻ (Share)</strong> <Share className="w-3.5 h-3.5 inline mx-1 text-neutral-600 dark:text-neutral-300" /> ở thanh công cụ trình duyệt Safari.
-                        </span>
-                      ) : (
-                        <span>
-                          Tap the <strong>Share</strong> button <Share className="w-3.5 h-3.5 inline mx-1 text-neutral-600 dark:text-neutral-300" /> in Safari navigation bar.
-                        </span>
-                      )}
+                      <span>
+                        {t.iosStep1a} <strong>{t.iosStep1b}</strong>{' '}
+                        <Share className="w-3.5 h-3.5 inline mx-1 text-neutral-600 dark:text-neutral-300" />{' '}
+                        {t.iosStep1c}
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-start gap-2.5">
@@ -103,15 +100,10 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({ lang, varian
                       2
                     </span>
                     <div>
-                      {lang === 'vi' ? (
-                        <span>
-                          Cuộn xuống và chọn <strong>Thêm vào MH chính (Add to Home Screen)</strong> <PlusSquare className="w-3.5 h-3.5 inline mx-1 text-neutral-600 dark:text-neutral-300" />.
-                        </span>
-                      ) : (
-                        <span>
-                          Scroll down and tap <strong>Add to Home Screen</strong> <PlusSquare className="w-3.5 h-3.5 inline mx-1 text-neutral-600 dark:text-neutral-300" />.
-                        </span>
-                      )}
+                      <span>
+                        {t.iosStep2a} <strong>{t.iosStep2b}</strong>{' '}
+                        <PlusSquare className="w-3.5 h-3.5 inline mx-1 text-neutral-600 dark:text-neutral-300" />.
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-start gap-2.5">
@@ -119,7 +111,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({ lang, varian
                       3
                     </span>
                     <div>
-                      {lang === 'vi' ? 'Bấm "Thêm" ở góc trên cùng bên phải để hoàn tất.' : 'Tap "Add" in the top right corner to finish.'}
+                      {t.iosStep3}
                     </div>
                   </div>
                 </>
@@ -130,9 +122,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({ lang, varian
                       1
                     </span>
                     <div>
-                      {lang === 'vi'
-                        ? 'Nhấn vào biểu tượng Cài đặt trên thanh địa chỉ trình duyệt (hoặc menu 3 chấm ⋮).'
-                        : 'Click the Install icon in your browser address bar or menu (⋮).'}
+                      {t.desktopStep1}
                     </div>
                   </div>
                   <div className="flex items-start gap-2.5">
@@ -140,9 +130,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({ lang, varian
                       2
                     </span>
                     <div>
-                      {lang === 'vi'
-                        ? 'Chọn "Cài đặt SplitWise Pro" để đưa biểu tượng ra Màn hình chính.'
-                        : 'Select "Install SplitWise Pro" to pin to your home screen or desktop.'}
+                      {t.desktopStep2}
                     </div>
                   </div>
                 </>
@@ -152,9 +140,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({ lang, varian
             <div className="flex items-center gap-2 text-[11px] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800/60">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>
-                {lang === 'vi'
-                  ? 'Ứng dụng hoạt động ngay cả khi không có mạng và dữ liệu được bảo vệ an toàn.'
-                  : 'Works offline with persistent, un-evicted local storage.'}
+                {t.installOfflineNote}
               </span>
             </div>
 
@@ -162,7 +148,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({ lang, varian
               onClick={() => setShowGuide(false)}
               className="w-full py-2 text-xs font-bold text-neutral-800 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-xl transition-colors"
             >
-              {lang === 'vi' ? 'Đã hiểu' : 'Got it'}
+              {t.gotItBtn}
             </button>
           </div>
         </div>

@@ -17,13 +17,14 @@ import { Group, Expense, Member, SettlementMode } from './types';
 import { formatCurrency, normalizeCurrencyCode } from './utils/currency';
 import { calculateMemberBalances, computeOptimizedSettlements } from './utils/debtSettlement';
 import { generateGroupSummaryText } from './utils/exportUtils';
-import { Language, TRANSLATIONS } from './utils/i18n';
+import { Language, TRANSLATIONS, isSupportedLanguage, LOCALES } from './utils/i18n';
 import { loadPersistentGroups, savePersistentGroups, requestPersistentStorage } from './utils/persistentStorage';
 import { Header } from './components/Header';
 import { ExpenseList } from './components/ExpenseList';
 import { SettlementView } from './components/SettlementView';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { PWAUpdatePrompt } from './components/PWAUpdatePrompt';
+import { LanguageDropdown } from './components/LanguageDropdown';
 
 // Modals are code-split so the initial bundle stays lean for fast PWA startup.
 const ExpenseModal = lazy(() =>
@@ -72,11 +73,11 @@ export default function App() {
     return 'light';
   });
 
-  // Language: Default 'en', can toggle to 'vi'
+  // Language: persisted code, validated against supported languages
   const [lang, setLang] = useState<Language>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY_LANG);
-      if (saved === 'vi' || saved === 'en') return saved;
+      if (isSupportedLanguage(saved)) return saved;
     } catch (e) {
       console.error(e);
     }
@@ -187,6 +188,7 @@ export default function App() {
       localStorage.setItem(STORAGE_KEY_LANG, lang);
       localStorage.setItem(STORAGE_KEY_LAST_PAYER, lastPayerId);
       localStorage.setItem(STORAGE_KEY_THEME, theme);
+      document.documentElement.lang = LOCALES[lang] || lang;
 
       if (theme === 'dark') {
         document.documentElement.classList.add('dark');
@@ -236,7 +238,7 @@ export default function App() {
       ...prev,
       currency: normalizeCurrencyCode(newCurrency),
     }));
-    showToast(lang === 'vi' ? `Đã đổi tiền tệ sang ${normalizeCurrencyCode(newCurrency)}` : `Currency changed to ${normalizeCurrencyCode(newCurrency)}`);
+    showToast(t.currencyChangedToast.replace('{code}', normalizeCurrencyCode(newCurrency)));
   };
 
   // Trip name & currency update
@@ -250,14 +252,12 @@ export default function App() {
         return g;
       })
     );
-    showToast(lang === 'vi' ? 'Đã lưu thông tin chuyến đi' : 'Trip details updated');
+    showToast(t.tripDetailsUpdatedToast);
   };
 
-  // Language toggle
-  const handleToggleLanguage = () => {
-    const nextLang: Language = lang === 'en' ? 'vi' : 'en';
+  // Language selection (dropdown)
+  const handleSetLanguage = (nextLang: Language) => {
     setLang(nextLang);
-    showToast(nextLang === 'vi' ? 'Đã chuyển sang Tiếng Việt' : 'Switched to English');
   };
 
   // Theme toggle
@@ -265,9 +265,7 @@ export default function App() {
     const nextTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(nextTheme);
     showToast(
-      nextTheme === 'dark'
-        ? (lang === 'vi' ? 'Đã bật giao diện tối' : 'Dark mode enabled')
-        : (lang === 'vi' ? 'Đã bật giao diện sáng' : 'Light mode enabled')
+      nextTheme === 'dark' ? t.darkEnabledToast : t.lightEnabledToast
     );
   };
 
@@ -286,7 +284,7 @@ export default function App() {
       return { ...prev, expenses: newExpenses };
     });
     setEditingExpense(null);
-    showToast(editingExpense ? (lang === 'vi' ? 'Đã cập nhật khoản chi' : 'Expense updated') : (lang === 'vi' ? 'Đã thêm khoản chi mới' : 'Expense added'));
+    showToast(editingExpense ? t.expenseUpdatedToast : t.expenseAddedToast);
   };
 
   const handleDeleteExpense = (expenseId: string) => {
@@ -294,7 +292,7 @@ export default function App() {
       ...prev,
       expenses: prev.expenses.filter((e) => e.id !== expenseId),
     }));
-    showToast(lang === 'vi' ? 'Đã xoá khoản chi' : 'Expense removed');
+    showToast(t.expenseRemovedToast);
   };
 
   // Member Handlers
@@ -306,7 +304,7 @@ export default function App() {
         : [...prev.members, memberToSave];
       return { ...prev, members: newMembers };
     });
-    showToast(lang === 'vi' ? 'Đã lưu thành viên' : 'Member saved');
+    showToast(t.memberSavedToast);
   };
 
   const handleDeleteMember = (memberId: string) => {
@@ -315,7 +313,7 @@ export default function App() {
       members: prev.members.filter((m) => m.id !== memberId),
       collectorId: prev.collectorId === memberId ? undefined : prev.collectorId,
     }));
-    showToast(lang === 'vi' ? 'Đã xoá thành viên' : 'Member deleted');
+    showToast(t.memberDeletedToast);
   };
 
   const handleSetCollector = (memberId: string) => {
@@ -323,7 +321,7 @@ export default function App() {
       ...prev,
       collectorId: memberId,
     }));
-    showToast(lang === 'vi' ? 'Đã chọn làm Thủ quỹ' : 'Designated as Collector');
+    showToast(t.collectorSetToast);
   };
 
   // Quick Batch Add members (Member 1, Member 2...)
@@ -344,7 +342,7 @@ export default function App() {
         const num = startNum + i;
         newMembers.push({
           id: `mem-${Date.now()}-${num}`,
-          name: lang === 'vi' ? `Thành viên ${num}` : `Member ${num}`,
+          name: t.defaultMemberName.replace('{n}', String(num)),
           avatarColor: AVATAR_COLORS[(num - 1) % AVATAR_COLORS.length],
         });
       }
@@ -353,7 +351,7 @@ export default function App() {
         members: [...prev.members, ...newMembers],
       };
     });
-    showToast(lang === 'vi' ? `Đã tạo thêm ${count} thành viên` : `Generated ${count} members`);
+    showToast(t.membersGeneratedToast.replace('{count}', String(count)));
   };
 
   const hasExpensesForMember = (memberId: string): boolean => {
@@ -391,7 +389,7 @@ export default function App() {
     for (let i = 1; i <= initialMemberCount; i++) {
       initialMembers.push({
         id: `mem-${Date.now()}-${i}`,
-        name: lang === 'vi' ? `Thành viên ${i}` : `Member ${i}`,
+          name: t.defaultMemberName.replace('{n}', String(i)),
         avatarColor: AVATAR_COLORS[(i - 1) % AVATAR_COLORS.length],
       });
     }
@@ -408,7 +406,7 @@ export default function App() {
 
     setGroups((prev) => [newGroup, ...prev]);
     setCurrentGroupId(newGroup.id);
-    showToast(lang === 'vi' ? `Đã tạo chuyến đi "${name}"` : `Created trip "${name}"`);
+    showToast(t.tripCreatedToast.replace('{name}', name));
   };
 
   const handleDeleteGroup = (groupId: string) => {
@@ -417,7 +415,7 @@ export default function App() {
     if (currentGroupId === groupId) {
       setCurrentGroupId(remaining[0]?.id || '');
     }
-    showToast(lang === 'vi' ? 'Đã xoá chuyến đi' : 'Trip deleted');
+    showToast(t.tripDeletedToast);
   };
 
   const handleExportAllJson = () => {
@@ -426,10 +424,10 @@ export default function App() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `SplitWise_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+    link.download = `SplitWisePro_Backup_${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     URL.revokeObjectURL(url);
-    showToast(lang === 'vi' ? 'Đã tải file sao lưu JSON' : 'Backup file downloaded');
+    showToast(t.backupDownloadedToast);
   };
 
   const handleImportJson = (content: string) => {
@@ -442,12 +440,12 @@ export default function App() {
         }));
         setGroups(normalized);
         setCurrentGroupId(normalized[0].id);
-        showToast(lang === 'vi' ? 'Đã nạp dữ liệu thành công' : 'Data imported successfully');
+        showToast(t.importSuccessToast);
       } else {
-        alert(lang === 'vi' ? 'Định dạng file sao lưu không hợp lệ.' : 'Invalid backup format.');
+        alert(t.invalidBackupFormat);
       }
     } catch (e) {
-      alert(lang === 'vi' ? 'Không thể đọc file JSON.' : 'Could not parse JSON file.');
+      alert(t.jsonParseError);
     }
   };
 
@@ -473,12 +471,10 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight">
-                {lang === 'vi' ? 'Chia tiền nhóm dễ dàng' : 'Split group expenses effortlessly'}
+                {t.emptyHeroTitle}
               </h1>
               <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">
-                {lang === 'vi'
-                  ? 'Tạo chuyến đi đầu tiên để bắt đầu ghi chép chi tiêu và tối ưu thanh toán nợ.'
-                  : 'Create your first trip to start tracking expenses and optimizing settlements.'}
+                {t.emptyHeroDesc}
               </p>
             </div>
             <div className="flex items-center justify-center gap-2">
@@ -487,14 +483,9 @@ export default function App() {
                 className="inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors shadow-md"
               >
                 <Plus className="w-4 h-4" />
-                {lang === 'vi' ? 'Tạo chuyến đi' : 'Create trip'}
+                {t.createTripSubmit}
               </button>
-              <button
-                onClick={handleToggleLanguage}
-                className="px-4 py-2.5 text-sm font-bold text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700 rounded-xl transition-colors"
-              >
-                {lang === 'en' ? 'Tiếng Việt' : 'English'}
-              </button>
+              <LanguageDropdown lang={lang} onSelect={handleSetLanguage} variant="button" />
             </div>
           </div>
         </main>
@@ -541,7 +532,7 @@ export default function App() {
         lang={lang}
         theme={theme}
         onTabChange={setActiveTab}
-        onToggleLanguage={handleToggleLanguage}
+        onSetLanguage={handleSetLanguage}
         onToggleTheme={handleToggleTheme}
         onChangeCurrency={handleChangeCurrency}
         onOpenAddExpense={() => {
@@ -623,7 +614,7 @@ export default function App() {
                   onClick={() => handleBatchAddMembers(4)}
                   className="px-3 py-1.5 text-xs font-semibold bg-white dark:bg-neutral-800 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 rounded-lg hover:bg-amber-100 dark:hover:bg-neutral-700 transition-colors"
                 >
-                  {lang === 'vi' ? '+ Tạo nhanh 4 thành viên' : '+ Quick Add 4 Members'}
+                  {t.quickAdd4Btn}
                 </button>
                 <button
                   onClick={() => setIsMemberManagerOpen(true)}
@@ -678,7 +669,7 @@ export default function App() {
                   {t.groupMembersTitle} ({currentGroup.members.length})
                 </h3>
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                  {lang === 'vi' ? 'Bấm "Báo cáo" để xem chi tiết tiền ăn uống, chi trả của từng người' : 'Click "Report" on any member to view their individual itemized report'}
+                  {t.membersHint}
                 </p>
               </div>
 
@@ -688,14 +679,14 @@ export default function App() {
                   className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700 rounded-lg transition-colors"
                 >
                   <UserPlus className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400" />
-                  <span>{lang === 'vi' ? '+ Thêm 3 người' : '+ Quick 3'}</span>
+                  <span>{t.quickAdd3Btn}</span>
                 </button>
 
                 <button
                   onClick={() => setIsMemberManagerOpen(true)}
                   className="px-3.5 py-1.5 text-xs font-bold text-white bg-neutral-900 dark:bg-neutral-100 dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-white rounded-lg transition-colors"
                 >
-                  {lang === 'vi' ? 'Quản lý thành viên' : 'Manage Members'}
+                  {t.manageMembersBtn}
                 </button>
               </div>
             </div>
@@ -706,7 +697,7 @@ export default function App() {
                   <Users className="w-6 h-6" />
                 </div>
                 <h4 className="text-sm font-bold text-neutral-900 dark:text-neutral-100 mb-1">
-                  {lang === 'vi' ? 'Chưa có thành viên nào' : 'No members yet'}
+                  {t.noMembersTitle}
                 </h4>
                 <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-4 max-w-sm mx-auto">
                   {t.quickAddMembersPrompt}
@@ -716,7 +707,7 @@ export default function App() {
                     onClick={() => handleBatchAddMembers(4)}
                     className="px-4 py-2 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
                   >
-                    {lang === 'vi' ? 'Tạo nhanh 4 thành viên (Member 1..4)' : 'Quick generate 4 members'}
+                    {t.quickGenerate4Btn}
                   </button>
                   <button
                     onClick={() => setIsMemberManagerOpen(true)}
@@ -766,7 +757,7 @@ export default function App() {
                           onClick={() => setSelectedMemberReportId(m.id)}
                           className="text-xs text-neutral-600 dark:text-neutral-400 hover:text-emerald-700 dark:hover:text-emerald-400 font-bold"
                         >
-                          {lang === 'vi' ? 'Báo cáo ➔' : 'Report ➔'}
+                          {t.reportLink}
                         </button>
                       </div>
 
@@ -774,7 +765,7 @@ export default function App() {
                       <div className="flex items-center justify-between text-xs pt-2 border-t border-neutral-100 dark:border-neutral-800 font-mono">
                         <div>
                           <span className="text-neutral-400 dark:text-neutral-500 block text-[10px] font-sans">
-                            {lang === 'vi' ? 'Đã chi' : 'Paid'}
+                            {t.paidLabel}
                           </span>
                           <span className="text-neutral-800 dark:text-neutral-200 font-semibold">
                             {formatCurrency(bal?.totalPaid || 0, currentGroup.currency)}
@@ -782,7 +773,7 @@ export default function App() {
                         </div>
                         <div>
                           <span className="text-neutral-400 dark:text-neutral-500 block text-[10px] font-sans">
-                            {lang === 'vi' ? 'Tiêu thụ' : 'Consumed'}
+                            {t.consumedLabel}
                           </span>
                           <span className="text-neutral-800 dark:text-neutral-200 font-semibold">
                             {formatCurrency(bal?.totalShare || 0, currentGroup.currency)}
@@ -820,7 +811,7 @@ export default function App() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-500 dark:text-neutral-400">
           <div>
             <strong className="font-bold text-neutral-800 dark:text-neutral-200">{t.appName}{t.appSub}</strong> ·{' '}
-            {lang === 'vi' ? 'Chia tiền nhóm thông minh, hỗ trợ nhóm con & tối ưu thanh toán nợ 1 lần' : 'Group expense splitter with flexible subgroup sharing & 1-transfer settlement'}
+            {t.footerTagline}
           </div>
           <div className="flex items-center gap-4">
             <button
@@ -837,12 +828,7 @@ export default function App() {
               {t.summaryReportBtn}
             </button>
             <span aria-hidden="true">·</span>
-            <button
-              onClick={handleToggleLanguage}
-              className="hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors font-bold"
-            >
-              {lang === 'en' ? 'Tiếng Việt' : 'English'}
-            </button>
+            <LanguageDropdown lang={lang} onSelect={handleSetLanguage} />
           </div>
         </div>
       </footer>

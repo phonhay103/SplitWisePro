@@ -268,7 +268,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                     {expense.isMultiplePayers && expense.multiplePayers && (
                       <div>
                         <span className="font-semibold text-neutral-700 dark:text-neutral-300 block mb-1">
-                          {lang === 'vi' ? 'Tiền từng người đã đóng trước:' : 'Upfront Payment Breakdown:'}
+                          {t.upfrontBreakdown}
                         </span>
                         <div className="flex flex-wrap gap-2">
                           {expense.multiplePayers.map((p) => {
@@ -293,14 +293,14 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
                         <span className="font-semibold text-neutral-700 dark:text-neutral-300">
-                          {lang === 'vi' ? 'Phần chi phí mỗi người chịu:' : 'Individual Share of this Expense:'}
+                          {t.individualShare}
                         </span>
                         <span className="text-neutral-500 dark:text-neutral-400 font-medium">
                           {expense.splitType === 'equal'
-                            ? (lang === 'vi' ? 'Chia đều' : 'Equal Split')
+                            ? t.equalSplitLabel
                             : expense.splitType === 'shares'
-                            ? (lang === 'vi' ? 'Theo phần' : 'By Shares')
-                            : (lang === 'vi' ? 'Số tiền cố định' : 'Exact Amounts')}
+                            ? t.bySharesLabel
+                            : t.exactAmountsLabel}
                         </span>
                       </div>
 

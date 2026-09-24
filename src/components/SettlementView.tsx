@@ -157,7 +157,7 @@ export const SettlementView: React.FC<SettlementViewProps> = ({
             {t.paymentTransfers} ({settlements.length})
           </h4>
           <span className="text-xs text-neutral-500 dark:text-neutral-400">
-            {lang === 'vi' ? 'Đánh dấu khi đã chuyển tiền xong' : 'Check off transfers as members send money'}
+            {t.checkOffHint}
           </span>
         </div>
 
@@ -203,7 +203,7 @@ export const SettlementView: React.FC<SettlementViewProps> = ({
                           {fromMem?.name}
                         </div>
                         <span className="text-[10px] text-neutral-400 dark:text-neutral-500">
-                          {lang === 'vi' ? 'Người chuyển' : 'Sender'}
+                          {t.senderLabel}
                         </span>
                       </div>
                     </div>
@@ -223,7 +223,7 @@ export const SettlementView: React.FC<SettlementViewProps> = ({
                           {toMem?.name}
                         </div>
                         <span className="text-[10px] text-neutral-400 dark:text-neutral-500">
-                          {lang === 'vi' ? 'Người nhận' : 'Recipient'}
+                          {t.recipientLabel}
                         </span>
                       </div>
                       <div
@@ -244,13 +244,13 @@ export const SettlementView: React.FC<SettlementViewProps> = ({
                         </div>
                       ) : (
                         <span className="text-[11px] text-neutral-400 dark:text-neutral-500 italic">
-                          {lang === 'vi' ? 'Chưa lưu STK nhận tiền' : 'No payment handle saved'}
+                          {t.noPaymentHandle}
                         </span>
                       )}
                     </div>
 
                     <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-100 dark:border-emerald-800/60 shrink-0">
-                      {lang === 'vi' ? 'Chuyển 1 lần' : '1-Transfer'}
+                      {t.oneTransferBadge}
                     </span>
                   </div>
 

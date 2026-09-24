@@ -72,7 +72,7 @@ export const MemberManagerModal: React.FC<MemberManagerModalProps> = ({
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      setErrorMsg(lang === 'vi' ? 'Vui lòng nhập tên thành viên' : 'Please enter a member name');
+      setErrorMsg(t.memberNameRequired);
       return;
     }
 
@@ -160,7 +160,7 @@ export const MemberManagerModal: React.FC<MemberManagerModalProps> = ({
                 title={t.quickBatchPrompt}
               >
                 <Users className="w-3.5 h-3.5" />
-                <span>{lang === 'vi' ? '+ Tạo hàng loạt' : '+ Quick Batch'}</span>
+                <span>{t.quickBatchBtn}</span>
               </button>
             </div>
           )}
@@ -169,7 +169,7 @@ export const MemberManagerModal: React.FC<MemberManagerModalProps> = ({
             <form onSubmit={handleSave} className="bg-neutral-50 dark:bg-neutral-850 p-4 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-3">
               <div className="flex items-center justify-between pb-1 border-b border-neutral-200 dark:border-neutral-700">
                 <span className="text-xs font-bold text-neutral-900 dark:text-neutral-100">
-                  {editingId === 'new' ? (lang === 'vi' ? 'Thêm thành viên mới' : 'Add New Member') : (lang === 'vi' ? 'Chỉnh sửa thành viên' : 'Edit Member Details')}
+                  {editingId === 'new' ? t.addNewMemberTitle : t.editMemberTitle}
                 </span>
                 <button
                   type="button"
@@ -252,7 +252,7 @@ export const MemberManagerModal: React.FC<MemberManagerModalProps> = ({
           {/* Members list */}
           {members.length === 0 ? (
             <div className="p-6 text-center text-xs text-neutral-400 dark:text-neutral-500 italic">
-              {lang === 'vi' ? 'Chưa có thành viên nào trong chuyến đi này. Bấm Thêm thành viên để bắt đầu.' : 'No members in this trip yet. Click Add Member to get started.'}
+              {t.noMembersEmpty}
             </div>
           ) : (
             <div className="space-y-2">
@@ -288,7 +288,7 @@ export const MemberManagerModal: React.FC<MemberManagerModalProps> = ({
                             </span>
                           ) : (
                             <span className="text-neutral-400 dark:text-neutral-500 italic text-[11px]">
-                              {lang === 'vi' ? 'Chưa có thông tin nhận tiền' : 'No payment handle'}
+                              {t.noPaymentHandle}
                             </span>
                           )}
                         </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { WifiOff, Database } from 'lucide-react';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
-import { Language } from '../utils/i18n';
+import { Language, TRANSLATIONS } from '../utils/i18n';
 
 interface OfflineIndicatorProps {
   lang: Language;
@@ -20,9 +20,7 @@ export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({ lang }) => {
       </div>
       <div>
         <span>
-          {lang === 'vi'
-            ? 'Ngoại tuyến (Offline) — Dữ liệu được bảo toàn bền vững'
-            : 'Offline Mode — Operating from persistent local database'}
+          {TRANSLATIONS[lang].offlineToast}
         </span>
       </div>
     </div>

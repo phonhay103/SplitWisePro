@@ -12,7 +12,7 @@ import {
 import { Group, MemberBalance, SettlementTransaction } from '../types';
 import { formatCurrency } from '../utils/currency';
 import { generateGroupSummaryText, downloadExpensesCSV } from '../utils/exportUtils';
-import { Language, TRANSLATIONS } from '../utils/i18n';
+import { Language, TRANSLATIONS, LOCALES } from '../utils/i18n';
 
 interface SummaryReportModalProps {
   isOpen: boolean;
@@ -73,7 +73,7 @@ export const SummaryReportModal: React.FC<SummaryReportModalProps> = ({
               className="px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors flex items-center gap-1.5 shadow-2xs"
             >
               {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? (lang === 'vi' ? 'Đã sao chép!' : 'Copied!') : t.copyForChatBtn}</span>
+              <span>{copied ? t.copiedToast : t.copyForChatBtn}</span>
             </button>
             <button
               onClick={handleDownloadCSV}
@@ -107,7 +107,7 @@ export const SummaryReportModal: React.FC<SummaryReportModalProps> = ({
               {t.summaryReportTitle.toUpperCase()} - {group.name.toUpperCase()}
             </h1>
             <p className="text-xs text-neutral-500">
-              {new Date().toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')} · Currency: {group.currency}
+              {new Date().toLocaleDateString(LOCALES[lang] || 'en-US')} · {t.currency}: {group.currency}
             </p>
             <hr className="my-4 border-neutral-300" />
           </div>
@@ -140,7 +140,7 @@ export const SummaryReportModal: React.FC<SummaryReportModalProps> = ({
                 {t.optimalPlanBadge}
               </span>
               <span className="text-xl font-bold font-mono text-emerald-700 dark:text-emerald-300 mt-1 block">
-                {settlements.length} {lang === 'vi' ? 'giao dịch' : 'transfers'}
+                {settlements.length} {t.transfersCountLabel}
               </span>
               <span className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5 block">
                 {t.max1Transfer}
@@ -157,9 +157,9 @@ export const SummaryReportModal: React.FC<SummaryReportModalProps> = ({
               <table className="w-full text-xs text-left">
                 <thead className="bg-neutral-50 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-semibold border-b border-neutral-200 dark:border-neutral-700">
                   <tr>
-                    <th className="p-3">{lang === 'vi' ? 'Thành viên' : 'Member'}</th>
-                    <th className="p-3 text-right">{lang === 'vi' ? 'Đã chi' : 'Total Paid'}</th>
-                    <th className="p-3 text-right">{lang === 'vi' ? 'Tiêu thụ' : 'Consumed'}</th>
+                    <th className="p-3">{t.memberColHeader}</th>
+                    <th className="p-3 text-right">{t.totalPaidColHeader}</th>
+                    <th className="p-3 text-right">{t.consumedLabel}</th>
                     <th className="p-3 text-right">{t.netBalance}</th>
                   </tr>
                 </thead>
@@ -184,7 +184,7 @@ export const SummaryReportModal: React.FC<SummaryReportModalProps> = ({
                               -{formatCurrency(Math.abs(b.netBalance), group.currency)}
                             </span>
                           ) : (
-                            <span className="text-neutral-400 dark:text-neutral-500">$0.00</span>
+                            <span className="text-neutral-400 dark:text-neutral-500">{formatCurrency(0, group.currency)}</span>
                           )}
                         </td>
                       </tr>
@@ -202,7 +202,7 @@ export const SummaryReportModal: React.FC<SummaryReportModalProps> = ({
                 {t.optimalRouteTitle}
               </h4>
               <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                {settlements.filter((tx) => tx.isPaid).length} / {settlements.length} {lang === 'vi' ? 'đã chuyển' : 'completed'}
+                {settlements.filter((tx) => tx.isPaid).length} / {settlements.length} {t.completedCountLabel}
               </span>
             </div>
 
@@ -245,7 +245,7 @@ export const SummaryReportModal: React.FC<SummaryReportModalProps> = ({
                               : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300'
                           }`}
                         >
-                          {tx.isPaid ? t.markedAsPaid : (lang === 'vi' ? 'Chưa chuyển' : 'Pending')}
+                          {tx.isPaid ? t.markedAsPaid : t.pendingStatus}
                         </span>
                       </div>
                     </div>
@@ -263,7 +263,7 @@ export const SummaryReportModal: React.FC<SummaryReportModalProps> = ({
             className="text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 flex items-center gap-1.5"
           >
             <Share2 className="w-3.5 h-3.5" />
-            <span>{copied ? (lang === 'vi' ? 'Đã sao chép tin nhắn!' : 'Copied summary!') : t.copyForChatBtn}</span>
+            <span>{copied ? t.copiedReportToast : t.copyForChatBtn}</span>
           </button>
           <button
             onClick={onClose}

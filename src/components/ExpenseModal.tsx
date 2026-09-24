@@ -111,7 +111,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
   const handleToggleMember = (memberId: string) => {
     if (selectedMemberIds.includes(memberId)) {
       if (selectedMemberIds.length === 1) {
-        setErrorMessage(lang === 'vi' ? 'Phải có ít nhất 1 người chia khoản chi!' : 'An expense must include at least 1 person!');
+        setErrorMessage(t.errNoBeneficiaries);
         return;
       }
       setSelectedMemberIds(selectedMemberIds.filter((id) => id !== memberId));
@@ -166,17 +166,17 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
     }
 
     if (!description.trim()) {
-      setErrorMessage(lang === 'vi' ? 'Vui lòng nhập tên khoản chi' : 'Please enter an expense description');
+      setErrorMessage(t.errDescriptionRequired);
       return;
     }
 
     if (currentTotalAmount <= 0) {
-      setErrorMessage(lang === 'vi' ? 'Vui lòng nhập số tiền hợp lệ' : 'Please enter a valid expense amount');
+      setErrorMessage(t.errAmountInvalid);
       return;
     }
 
     if (effectiveMemberIds.length === 0) {
-      setErrorMessage(lang === 'vi' ? 'Khoản chi phải có ít nhất 1 người tham gia' : 'Please select at least 1 member');
+      setErrorMessage(t.errNoMembers);
       return;
     }
 
@@ -193,16 +193,16 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
         .map(([memberId, amount]) => ({ memberId, amount }));
     } else {
       if (!primaryPayerId) {
-        setErrorMessage(lang === 'vi' ? 'Vui lòng chọn người thanh toán' : 'Please select who paid');
+        setErrorMessage(t.errNoPayer);
         return;
       }
     }
 
     if (isSubgroupMode && splitType === 'exact' && Math.abs(diffExactSplit) > 0.05) {
       setErrorMessage(
-        lang === 'vi'
-          ? `Tổng tiền chia lẻ (${formatCurrency(sumExactSplit, currency)}) chưa khớp với hóa đơn (${formatCurrency(currentTotalAmount, currency)}).`
-          : `Sum of exact shares (${formatCurrency(sumExactSplit, currency)}) must equal the total bill.`
+        t.errExactMismatch
+          .replace('{sum}', formatCurrency(sumExactSplit, currency))
+          .replace('{total}', formatCurrency(currentTotalAmount, currency))
       );
       return;
     }
@@ -636,7 +636,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                 <div className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center justify-between">
                   <span>
                     <strong className="text-emerald-700 dark:text-emerald-400">
-                      {selectedMemberIds.length} / {members.length} {lang === 'vi' ? 'người tham gia' : 'members selected'}
+                      {t.membersSelected.replace('{selected}', String(selectedMemberIds.length)).replace('{total}', String(members.length))}
                     </strong>
                   </span>
                   {splitType === 'equal' && currentTotalAmount > 0 && selectedMemberIds.length > 0 && (
@@ -686,7 +686,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                 type="button"
                 onClick={(e) => handleSubmit(e, true)}
                 className="px-3 sm:px-4 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border border-emerald-300 dark:border-emerald-800 rounded-lg transition-colors whitespace-nowrap"
-                title={lang === 'vi' ? 'Lưu khoản này và tiếp tục nhập khoản khác' : 'Save and enter another expense'}
+                title={t.saveAndAddTitle}
               >
                 {t.saveAndAddAnotherBtn}
               </button>

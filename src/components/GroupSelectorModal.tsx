@@ -74,7 +74,7 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      setErrorMsg(lang === 'vi' ? 'Vui lòng nhập tên chuyến đi' : 'Please enter a trip name');
+      setErrorMsg(t.tripNameRequired);
       return;
     }
     onCreateGroup(name.trim(), normalizeCurrencyCode(currency), Math.max(0, Math.floor(memberCount)));
@@ -239,7 +239,7 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
                     className="p-3 bg-neutral-50 dark:bg-neutral-900 rounded-xl border border-emerald-300 dark:border-emerald-600 space-y-2 text-xs"
                   >
                     <div className="font-semibold text-neutral-800 dark:text-neutral-200">
-                      {lang === 'vi' ? 'Đổi tên & Tiền tệ' : 'Rename & Change Currency'}
+                      {t.renameCurrencyTitle}
                     </div>
                     <div className="flex gap-2">
                       <input
@@ -273,7 +273,7 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
                         onClick={() => handleSaveEdit(g.id)}
                         className="px-3 py-1 bg-emerald-600 text-white rounded font-semibold"
                       >
-                        {lang === 'vi' ? 'Lưu' : 'Save'}
+                        {t.saveShortBtn}
                       </button>
                     </div>
                   </div>
@@ -326,7 +326,7 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
                           startEditGroup(g);
                         }}
                         className="p-1 text-neutral-400 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-200 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
-                        title={lang === 'vi' ? 'Đổi tên & tiền tệ' : 'Rename & currency'}
+                        title={t.renameCurrencyTitle}
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
@@ -334,7 +334,7 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (confirm(lang === 'vi' ? `Bạn có chắc muốn xoá chuyến đi "${g.name}"?` : `Delete group "${g.name}"?`)) {
+                          if (confirm(t.deleteGroupConfirm.replace('{name}', g.name))) {
                             onDeleteGroup(g.id);
                           }
                         }}
@@ -353,7 +353,7 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
           {/* Storage Engine & Longevity Information */}
           <div className="pt-3 border-t border-neutral-100 dark:border-neutral-800 space-y-2">
             <span className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wide block">
-              {lang === 'vi' ? 'Bộ nhớ & Độ bền dữ liệu' : 'Storage Engine & Longevity'}
+              {t.storageTitle}
             </span>
             <div className="p-3 bg-neutral-50 dark:bg-neutral-850 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-2 text-xs">
               <div className="flex items-center justify-between">
@@ -371,15 +371,13 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
                   }`}
                 >
                   {storageStatus?.isPersistent
-                    ? (lang === 'vi' ? 'Đã bảo vệ chống xoá' : 'Persistent (No Eviction)')
-                    : (lang === 'vi' ? 'Tiêu chuẩn IndexedDB' : 'IndexedDB Active')}
+                    ? t.persistentBadge
+                    : t.standardBadge}
                 </span>
               </div>
 
               <p className="text-[11px] text-neutral-500 dark:text-neutral-400 leading-relaxed">
-                {lang === 'vi'
-                  ? 'Ứng dụng lưu vào IndexedDB thay vì chỉ dùng localStorage thông thường. Dữ liệu được bảo vệ an toàn, không bị giới hạn 5MB và không bị Safari tự xoá sau 7 ngày.'
-                  : 'Data is stored asynchronously in IndexedDB and exempted from automatic browser cache eviction (no 5MB limit, no 7-day Safari ITP purge).'}
+                {t.storageDesc}
               </p>
 
               {storageStatus && !storageStatus.isPersistent && (
@@ -389,7 +387,7 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
                   className="w-full mt-1 py-1.5 px-3 bg-white dark:bg-neutral-800 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-neutral-700 rounded-lg font-semibold text-xs transition-colors flex items-center justify-center gap-1.5"
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>{lang === 'vi' ? 'Kích hoạt Lưu trữ vĩnh viễn (Persist)' : 'Enable Persistent Storage'}</span>
+                  <span>{t.enablePersistBtn}</span>
                 </button>
               )}
             </div>

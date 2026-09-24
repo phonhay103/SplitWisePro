@@ -20,8 +20,8 @@ export default defineConfig(() => {
         ],
         manifest: {
           id: '/',
-          name: 'SplitWise Pro - Chia Tiền Nhóm',
-          short_name: 'ChiaTien',
+          name: 'SplitWisePro - Chia Tiền Nhóm',
+          short_name: 'SplitWisePro',
           description:
             'Chia tiền nhóm thông minh, hỗ trợ nhóm con, tối ưu thanh toán nợ 1 lần và xuất báo cáo chi tiết.',
           theme_color: '#059669',

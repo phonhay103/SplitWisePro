@@ -199,7 +199,7 @@ export const MemberReportModal: React.FC<MemberReportModalProps> = ({
                           </div>
                         ) : (
                           <div className="text-[11px] text-neutral-400 dark:text-neutral-500 italic mt-0.5">
-                            {lang === 'vi' ? 'Tiền mặt hoặc chuyển khoản trực tiếp' : 'Cash or direct transfer'}
+                            {t.cashDirectNote}
                           </div>
                         )}
                       </div>
@@ -265,7 +265,7 @@ export const MemberReportModal: React.FC<MemberReportModalProps> = ({
 
             {paidExpenses.length === 0 ? (
               <p className="text-xs text-neutral-400 dark:text-neutral-500 italic p-3 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
-                {lang === 'vi' ? 'Bạn chưa thanh toán khoản chi nào trong chuyến đi này.' : 'You have not paid upfront for any expenses in this group.'}
+                {t.noPaidExpenses}
               </p>
             ) : (
               <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden divide-y divide-neutral-100 dark:divide-neutral-800 text-xs">
@@ -276,7 +276,7 @@ export const MemberReportModal: React.FC<MemberReportModalProps> = ({
                       <div>
                         <span className="font-bold text-neutral-900 dark:text-neutral-100">{expense.description}</span>
                         <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
-                          {expense.date} · {lang === 'vi' ? 'Tổng bill' : 'Total bill'} {formatCurrency(expense.amount, group.currency)} ·{' '}
+                          {expense.date} · {t.totalBillLabel} {formatCurrency(expense.amount, group.currency)} ·{' '}
                           <span className={isFull ? 'text-neutral-500 dark:text-neutral-400' : 'text-emerald-700 dark:text-emerald-400 font-semibold'}>
                             {isFull ? t.allGroupBadge : `${t.subgroupBadge} (${expense.selectedMemberIds.length})`}
                           </span>
@@ -305,7 +305,7 @@ export const MemberReportModal: React.FC<MemberReportModalProps> = ({
 
             {consumedExpenses.length === 0 ? (
               <p className="text-xs text-neutral-400 dark:text-neutral-500 italic p-3 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
-                {lang === 'vi' ? 'Bạn không tham gia chia khoản tiền nào.' : 'You were not included in any expenses.'}
+                {t.noSharedExpenses}
               </p>
             ) : (
               <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden divide-y divide-neutral-100 dark:divide-neutral-800 text-xs">
