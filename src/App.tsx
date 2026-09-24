@@ -808,27 +808,10 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 py-6 mt-12 no-print transition-colors">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-500 dark:text-neutral-400">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-center text-center text-xs text-neutral-500 dark:text-neutral-400">
           <div>
             <strong className="font-bold text-neutral-800 dark:text-neutral-200">{t.appName}{t.appSub}</strong> ·{' '}
             {t.footerTagline}
-          </div>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setIsGroupSelectorOpen(true)}
-              className="hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors"
-            >
-              {t.switchTrip}
-            </button>
-            <span aria-hidden="true">·</span>
-            <button
-              onClick={() => setIsSummaryReportOpen(true)}
-              className="hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors"
-            >
-              {t.summaryReportBtn}
-            </button>
-            <span aria-hidden="true">·</span>
-            <LanguageDropdown lang={lang} onSelect={handleSetLanguage} />
           </div>
         </div>
       </footer>

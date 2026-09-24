@@ -66,11 +66,11 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-1 min-w-0">
             <button
               onClick={onOpenGroupSelector}
-              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold text-neutral-800 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg transition-colors truncate max-w-[140px] sm:max-w-[200px]"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-200 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-lg transition-colors truncate max-w-[150px] sm:max-w-[220px] focus-visible:outline-2 focus-visible:outline-emerald-500"
               title={t.switchTrip}
             >
               <span className="truncate">{currentGroup.name}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400 shrink-0" />
+              <ChevronDown className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
             </button>
 
             {/* Quick Rename Button */}
