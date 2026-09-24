@@ -653,8 +653,10 @@ export default function App() {
             balances={memberBalances}
             settlements={settlementResult.transactions}
             mode={settlementMode}
+            collectorId={currentGroup.collectorId}
             lang={lang}
             onModeChange={setSettlementMode}
+            onCollectorChange={handleSetCollector}
             onTogglePaid={handleTogglePaid}
             onOpenMemberReport={(memberId) => setSelectedMemberReportId(memberId)}
             onOpenGroupReport={() => setIsSummaryReportOpen(true)}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   ArrowRight,
+  ArrowRightLeft,
   CheckCircle2,
   Circle,
   Copy,
@@ -27,8 +28,10 @@ interface SettlementViewProps {
   balances: MemberBalance[];
   settlements: SettlementTransaction[];
   mode: SettlementMode;
+  collectorId?: string;
   lang: Language;
   onModeChange: (newMode: SettlementMode) => void;
+  onCollectorChange: (memberId: string) => void;
   onTogglePaid: (transactionId: string, fromId: string, toId: string) => void;
   onOpenMemberReport: (memberId: string) => void;
   onOpenGroupReport: () => void;
@@ -40,8 +43,10 @@ export const SettlementView: React.FC<SettlementViewProps> = ({
   balances,
   settlements,
   mode,
+  collectorId,
   lang,
   onModeChange,
+  onCollectorChange,
   onTogglePaid,
   onOpenMemberReport,
   onOpenGroupReport,
@@ -52,6 +57,16 @@ export const SettlementView: React.FC<SettlementViewProps> = ({
   const getMember = (id: string) => members.find((m) => m.id === id);
 
   const debtors = balances.filter((b) => b.netBalance < -0.01);
+
+  // Default intermediary: designated collector, else largest creditor, else first member
+  const creditorsSorted = [...balances]
+    .filter((b) => b.netBalance > 0.01)
+    .sort((a, b) => b.netBalance - a.netBalance);
+  const effectiveHubId =
+    collectorId && members.some((m) => m.id === collectorId)
+      ? collectorId
+      : creditorsSorted[0]?.memberId ?? members[0]?.id ?? '';
+  const hubMember = getMember(effectiveHubId);
 
   const paidCount = settlements.filter((tx) => tx.isPaid).length;
 
@@ -86,34 +101,114 @@ export const SettlementView: React.FC<SettlementViewProps> = ({
             </p>
           </div>
 
-          {/* Strategy Mode Toggle & Report */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 shrink-0">
-            <div className="flex items-center gap-1 p-1 bg-neutral-100 dark:bg-neutral-800/80 rounded-lg border border-neutral-200 dark:border-neutral-700 text-xs">
+          {/* Payment Method Selection & Report */}
+          <div className="flex flex-col items-stretch gap-2 shrink-0 w-full md:w-auto md:max-w-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-2" role="radiogroup" aria-label={t.optimalPlanTitle}>
+              {/* Method 1: Direct between members */}
               <button
+                type="button"
+                role="radio"
+                aria-checked={mode === 'direct_optimized'}
                 onClick={() => onModeChange('direct_optimized')}
-                className={`px-3 py-1.5 font-medium rounded-md transition-colors whitespace-nowrap ${
+                className={`text-left p-3 rounded-xl border-2 transition-colors ${
                   mode === 'direct_optimized'
-                    ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 shadow-2xs font-bold'
-                    : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'
+                    ? 'border-emerald-500 dark:border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/30'
+                    : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-600'
                 }`}
               >
-                {t.directMatching}
+                <span className="flex items-center justify-between gap-2">
+                  <span className={`flex items-center gap-1.5 text-xs font-bold ${
+                    mode === 'direct_optimized'
+                      ? 'text-emerald-800 dark:text-emerald-200'
+                      : 'text-neutral-800 dark:text-neutral-200'
+                  }`}>
+                    <ArrowRightLeft className={`w-4 h-4 ${
+                      mode === 'direct_optimized'
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-neutral-400 dark:text-neutral-500'
+                    }`} />
+                    {t.directMatching}
+                  </span>
+                  <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                    mode === 'direct_optimized'
+                      ? 'border-emerald-500 dark:border-emerald-400'
+                      : 'border-neutral-300 dark:border-neutral-600'
+                  }`}>
+                    {mode === 'direct_optimized' && (
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+                    )}
+                  </span>
+                </span>
+                <span className="block mt-1 text-[11px] leading-snug text-neutral-500 dark:text-neutral-400">
+                  {t.directModeDesc}
+                </span>
               </button>
+
+              {/* Method 2: Via 1 intermediary */}
               <button
+                type="button"
+                role="radio"
+                aria-checked={mode === 'hub_collector'}
                 onClick={() => onModeChange('hub_collector')}
-                className={`px-3 py-1.5 font-medium rounded-md transition-colors whitespace-nowrap ${
+                className={`text-left p-3 rounded-xl border-2 transition-colors ${
                   mode === 'hub_collector'
-                    ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 shadow-2xs font-bold'
-                    : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'
+                    ? 'border-emerald-500 dark:border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/30'
+                    : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-600'
                 }`}
               >
-                {t.hubCollector}
+                <span className="flex items-center justify-between gap-2">
+                  <span className={`flex items-center gap-1.5 text-xs font-bold ${
+                    mode === 'hub_collector'
+                      ? 'text-emerald-800 dark:text-emerald-200'
+                      : 'text-neutral-800 dark:text-neutral-200'
+                  }`}>
+                    <ShieldCheck className={`w-4 h-4 ${
+                      mode === 'hub_collector'
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-neutral-400 dark:text-neutral-500'
+                    }`} />
+                    {t.hubCollector}
+                  </span>
+                  <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                    mode === 'hub_collector'
+                      ? 'border-emerald-500 dark:border-emerald-400'
+                      : 'border-neutral-300 dark:border-neutral-600'
+                  }`}>
+                    {mode === 'hub_collector' && (
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+                    )}
+                  </span>
+                </span>
+                <span className="block mt-1 text-[11px] leading-snug text-neutral-500 dark:text-neutral-400">
+                  {t.hubModeDesc}
+                </span>
               </button>
             </div>
 
+            {/* Intermediary picker (visible when hub mode active) */}
+            {mode === 'hub_collector' && members.length > 0 && (
+              <label className="flex items-center gap-2 p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50/60 dark:bg-emerald-950/30 text-xs">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="font-bold text-emerald-800 dark:text-emerald-200 whitespace-nowrap">
+                  {t.selectIntermediary}
+                </span>
+                <select
+                  value={effectiveHubId}
+                  onChange={(e) => onCollectorChange(e.target.value)}
+                  className="flex-1 min-w-0 text-xs font-semibold rounded-lg border border-neutral-300 dark:border-neutral-600 px-2 py-1.5 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 focus:outline-2 focus:outline-emerald-500"
+                >
+                  {members.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+
             <button
               onClick={onOpenGroupReport}
-              className="px-3 py-1.5 text-xs font-bold text-neutral-800 dark:text-neutral-200 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-750 border border-neutral-300 dark:border-neutral-700 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap"
+              className="px-3 py-1.5 text-xs font-bold text-neutral-800 dark:text-neutral-200 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-750 border border-neutral-300 dark:border-neutral-700 rounded-lg transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap"
             >
               <FileText className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400" />
               <span>{t.summaryReportBtn}</span>
