@@ -89,9 +89,6 @@ export const SettlementView: React.FC<SettlementViewProps> = ({
                 <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 {t.optimalPlanBadge}
               </span>
-              <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                · {t.transfersPerDebtor}: {t.max1Transfer}
-              </span>
             </div>
             <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
               {t.optimalPlanTitle}
@@ -217,7 +214,7 @@ export const SettlementView: React.FC<SettlementViewProps> = ({
         </div>
 
         {/* Quick status metrics */}
-        <div className="mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-800 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+        <div className="mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-800 grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
           <div className="bg-neutral-50 dark:bg-neutral-800/60 p-2.5 rounded-xl">
             <span className="text-[11px] text-neutral-500 dark:text-neutral-400 block">{t.totalTransfers}</span>
             <span className="text-base font-bold font-mono text-neutral-900 dark:text-neutral-100">
@@ -228,12 +225,6 @@ export const SettlementView: React.FC<SettlementViewProps> = ({
             <span className="text-[11px] text-neutral-500 dark:text-neutral-400 block">{t.debtorsSettling}</span>
             <span className="text-base font-bold font-mono text-neutral-900 dark:text-neutral-100">
               {debtors.length}
-            </span>
-          </div>
-          <div className="bg-neutral-50 dark:bg-neutral-800/60 p-2.5 rounded-xl">
-            <span className="text-[11px] text-neutral-500 dark:text-neutral-400 block">{t.transfersPerDebtor}</span>
-            <span className="text-base font-bold font-mono text-emerald-600 dark:text-emerald-400">
-              {t.max1Transfer}
             </span>
           </div>
           <div className="bg-neutral-50 dark:bg-neutral-800/60 p-2.5 rounded-xl">

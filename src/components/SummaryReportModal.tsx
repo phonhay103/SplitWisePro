@@ -142,9 +142,6 @@ export const SummaryReportModal: React.FC<SummaryReportModalProps> = ({
               <span className="text-xl font-bold font-mono text-emerald-700 dark:text-emerald-300 mt-1 block">
                 {settlements.length} {t.transfersCountLabel}
               </span>
-              <span className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5 block">
-                {t.max1Transfer}
-              </span>
             </div>
           </div>
 

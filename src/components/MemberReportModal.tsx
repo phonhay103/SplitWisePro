@@ -176,9 +176,6 @@ export const MemberReportModal: React.FC<MemberReportModalProps> = ({
                   <ArrowUpRight className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                   {t.singleTransferInstruction}
                 </span>
-                <span className="text-[11px] text-amber-700 dark:text-amber-400">
-                  {t.max1Transfer}
-                </span>
               </div>
 
               <div className="space-y-2">
