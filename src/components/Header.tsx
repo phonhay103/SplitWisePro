@@ -15,6 +15,7 @@ import { Language, TRANSLATIONS } from '../utils/i18n';
 import { CURRENCIES } from '../utils/currency';
 import { PWAInstallButton } from './PWAInstallButton';
 import { LanguageDropdown } from './LanguageDropdown';
+import { useClickOutside } from '../hooks/useClickOutside';
 
 interface HeaderProps {
   currentGroup: Group;
@@ -47,6 +48,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const t = TRANSLATIONS[lang];
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
+  const currencyRef = useClickOutside<HTMLDivElement>(() => setShowCurrencyDropdown(false));
 
   return (
     <header className="sticky top-0 z-30 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800 transition-colors no-print">
@@ -126,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Global Controls: Currency + Language + Theme + Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Currency Switcher */}
-          <div className="relative">
+          <div className="relative" ref={currencyRef}>
             <button
               onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
               className="px-2 py-1 text-xs font-mono font-bold text-neutral-700 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors flex items-center gap-0.5"

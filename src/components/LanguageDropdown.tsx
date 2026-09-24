@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Globe, ChevronDown } from 'lucide-react';
 import { Language, LANGUAGES, TRANSLATIONS } from '../utils/i18n';
+import { useClickOutside } from '../hooks/useClickOutside';
 
 interface LanguageDropdownProps {
   lang: Language;
@@ -10,6 +11,7 @@ interface LanguageDropdownProps {
 
 export const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ lang, onSelect, variant = 'header' }) => {
   const [open, setOpen] = useState(false);
+  const containerRef = useClickOutside<HTMLDivElement>(() => setOpen(false));
   const t = TRANSLATIONS[lang];
   const current = LANGUAGES.find((l) => l.code === lang) ?? LANGUAGES[0];
 
@@ -19,7 +21,7 @@ export const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ lang, onSele
       : 'px-4 py-2.5 text-sm font-bold text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700 rounded-xl transition-colors flex items-center gap-1.5';
 
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <button
         onClick={() => setOpen(!open)}
         className={buttonClass}
