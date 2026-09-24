@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   X,
   Plus,
@@ -7,13 +7,10 @@ import {
   Upload,
   Edit2,
   Check,
-  Database,
-  ShieldCheck,
 } from 'lucide-react';
 import { Group } from '../types';
 import { formatCurrency, CURRENCIES, DEFAULT_CURRENCY, normalizeCurrencyCode } from '../utils/currency';
 import { Language, TRANSLATIONS } from '../utils/i18n';
-import { getStorageStatus, requestPersistentStorage, StorageStatus } from '../utils/persistentStorage';
 
 interface GroupSelectorModalProps {
   isOpen: boolean;
@@ -55,19 +52,6 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
   const [editCurrency, setEditCurrency] = useState(DEFAULT_CURRENCY);
 
   const [errorMsg, setErrorMsg] = useState('');
-  const [storageStatus, setStorageStatus] = useState<StorageStatus | null>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      getStorageStatus().then(setStorageStatus);
-    }
-  }, [isOpen]);
-
-  const handleRequestPersist = async () => {
-    const granted = await requestPersistentStorage();
-    const updated = await getStorageStatus();
-    setStorageStatus(updated);
-  };
 
   if (!isOpen) return null;
 
@@ -348,49 +332,6 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
                 </div>
               );
             })}
-          </div>
-
-          {/* Storage Engine & Longevity Information */}
-          <div className="pt-3 border-t border-neutral-100 dark:border-neutral-800 space-y-2">
-            <span className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wide block">
-              {t.storageTitle}
-            </span>
-            <div className="p-3 bg-neutral-50 dark:bg-neutral-850 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-2 text-xs">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Database className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  <span className="font-bold text-neutral-800 dark:text-neutral-200">
-                    {storageStatus?.engine || 'IndexedDB + StorageManager'}
-                  </span>
-                </div>
-                <span
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                    storageStatus?.isPersistent
-                      ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
-                      : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300'
-                  }`}
-                >
-                  {storageStatus?.isPersistent
-                    ? t.persistentBadge
-                    : t.standardBadge}
-                </span>
-              </div>
-
-              <p className="text-[11px] text-neutral-500 dark:text-neutral-400 leading-relaxed">
-                {t.storageDesc}
-              </p>
-
-              {storageStatus && !storageStatus.isPersistent && (
-                <button
-                  type="button"
-                  onClick={handleRequestPersist}
-                  className="w-full mt-1 py-1.5 px-3 bg-white dark:bg-neutral-800 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-neutral-700 rounded-lg font-semibold text-xs transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>{t.enablePersistBtn}</span>
-                </button>
-              )}
-            </div>
           </div>
 
           {/* Backup & Restore */}
