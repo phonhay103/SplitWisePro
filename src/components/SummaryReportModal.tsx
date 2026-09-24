@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import {
   X,
-  Copy,
-  Check,
   Download,
   Printer,
   Sparkles,
@@ -68,13 +66,6 @@ export const SummaryReportModal: React.FC<SummaryReportModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleCopySummary}
-              className="px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors flex items-center gap-1.5 shadow-2xs"
-            >
-              {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? t.copiedToast : t.copyForChatBtn}</span>
-            </button>
             <button
               onClick={handleDownloadCSV}
               className="px-3 py-1.5 text-xs font-semibold text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700 rounded-lg transition-colors flex items-center gap-1.5"
