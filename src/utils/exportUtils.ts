@@ -66,7 +66,7 @@ export function generateGroupSummaryText(
     lines.push(``);
     lines.push(`⚡ OPTIMIZED SETTLEMENT PLAN (EACH PERSON SENDS AT MOST 1 PAYMENT):`);
     if (settlements.length === 0) {
-      lines.push(`🎉 Everyone is fully settled! No debts outstanding.`);
+      lines.push(`🎉 Everyone is fully settled! Nothing left to settle.`);
     } else {
       settlements.forEach((tx, idx) => {
         const fromMem = group.members.find((m) => m.id === tx.fromMemberId);
@@ -199,7 +199,7 @@ export function generateMemberReportText(
         lines.push(`  • ${fromM?.name}: ${formatCurrency(tx.amount, group.currency)} ${tx.isPaid ? '(Received ✅)' : '(Pending)'}`);
       });
     } else if (balance.netBalance < -0.01) {
-      lines.push(`🔴 YOU OWE: -${formatCurrency(Math.abs(balance.netBalance), group.currency)}`);
+      lines.push(`🔴 TO PAY: -${formatCurrency(Math.abs(balance.netBalance), group.currency)}`);
       lines.push(`  🎯 YOUR SINGLE-TRANSFER PAYMENT:`);
       outgoing.forEach((tx) => {
         const toM = group.members.find((m) => m.id === tx.toMemberId);
