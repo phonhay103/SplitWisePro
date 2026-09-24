@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#047857" />
+      <stop offset="50%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#022c22" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Base Rounded Rectangle with Emerald Gradient -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+
+  <!-- Subtle Top Highlight -->
+  <rect width="512" height="256" rx="112" fill="url(#glowGrad)" />
+
+  <!-- Central Emblem: Connected Sharing Nodes & Currency Split Symbol -->
+  <g filter="url(#shadow)" transform="translate(256, 256)">
+    <!-- Circular Central Ring -->
+    <circle cx="0" cy="0" r="140" fill="none" stroke="#ffffff" stroke-width="24" opacity="0.95" />
+
+    <!-- Split Arrows / Exchange Loop -->
+    <!-- Top-Right Node -->
+    <circle cx="95" cy="-95" r="42" fill="#ffffff" />
+    <circle cx="95" cy="-95" r="26" fill="#059669" />
+
+    <!-- Bottom-Left Node -->
+    <circle cx="-95" cy="95" r="42" fill="#ffffff" />
+    <circle cx="-95" cy="95" r="26" fill="#047857" />
+
+    <!-- Top-Left Node -->
+    <circle cx="-95" cy="-95" r="32" fill="#ecfdf5" />
+
+    <!-- Center Currency / Split Indicator -->
+    <path d="M-40 -40 L40 40 M40 -40 L-40 40" stroke="#ffffff" stroke-width="20" stroke-linecap="round" />
+    <circle cx="0" cy="0" r="24" fill="#ffffff" />
+  </g>
+</svg>

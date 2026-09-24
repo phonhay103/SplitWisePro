@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@custom-variant dark (.dark &, &.dark);
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Ensure all inputs, selects, and textareas respect dark mode with optimal contrast and no white glare */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="range"]),
+.dark select,
+.dark textarea {
+  color-scheme: dark !important;
+  background-color: #262626 !important; /* Tailwind neutral-800 */
+  color: #f5f5f5 !important;            /* Tailwind neutral-100 */
+  border-color: #404040 !important;      /* Tailwind neutral-700 */
+}
+
+/* High-contrast focus state for dark mode inputs */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="range"]):focus,
+.dark select:focus,
+.dark textarea:focus {
+  background-color: #171717 !important; /* Tailwind neutral-900 */
+  color: #ffffff !important;
+  border-color: #10b981 !important;     /* Tailwind emerald-500 */
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25) !important;
+  outline: none !important;
+}
+
+/* Clear readable placeholder in dark mode */
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #a3a3a3 !important; /* Tailwind neutral-400 */
+  opacity: 1 !important;
+}
+
+/* Prevent blinding white background on browser autofill in dark mode */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill,
+.dark select:-webkit-autofill {
+  -webkit-text-fill-color: #f5f5f5 !important;
+  -webkit-box-shadow: 0 0 0px 1000px #262626 inset !important;
+  box-shadow: 0 0 0px 1000px #262626 inset !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* Native date input dark scheme & icon */
+.dark input[type="date"] {
+  color-scheme: dark !important;
+}
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.9) brightness(1.2);
+  cursor: pointer;
+}
+
+/* Custom scrollbars and print enhancements */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .print-card {
+    border: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+}

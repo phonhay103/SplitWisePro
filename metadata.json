@@ -1,0 +1,7 @@
+{
+  "name": "ChiaTien - Chia Tiền Nhóm & Tối Ưu Nợ 1 Chạm",
+  "description": "Ứng dụng chia tiền nhóm thông minh, hỗ trợ nhiều người cùng chi, chia cho nhóm con, tự động tối ưu hoá thanh toán để mỗi người chỉ chuyển khoản tối đa 1 lần và xuất báo cáo tổng kết chi tiết.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
