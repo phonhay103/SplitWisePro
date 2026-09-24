@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import {
   Plus,
   Receipt,
@@ -22,14 +22,35 @@ import { Language, TRANSLATIONS } from './utils/i18n';
 import { loadPersistentGroups, savePersistentGroups, requestPersistentStorage } from './utils/persistentStorage';
 import { Header } from './components/Header';
 import { ExpenseList } from './components/ExpenseList';
-import { ExpenseModal } from './components/ExpenseModal';
 import { SettlementView } from './components/SettlementView';
-import { MemberReportModal } from './components/MemberReportModal';
-import { SummaryReportModal } from './components/SummaryReportModal';
-import { MemberManagerModal } from './components/MemberManagerModal';
-import { GroupSelectorModal } from './components/GroupSelectorModal';
-import { RenameTripModal } from './components/RenameTripModal';
 import { OfflineIndicator } from './components/OfflineIndicator';
+import { PWAUpdatePrompt } from './components/PWAUpdatePrompt';
+
+// Modals are code-split so the initial bundle stays lean for fast PWA startup.
+const ExpenseModal = lazy(() =>
+  import('./components/ExpenseModal').then((m) => ({ default: m.ExpenseModal }))
+);
+const MemberReportModal = lazy(() =>
+  import('./components/MemberReportModal').then((m) => ({ default: m.MemberReportModal }))
+);
+const SummaryReportModal = lazy(() =>
+  import('./components/SummaryReportModal').then((m) => ({ default: m.SummaryReportModal }))
+);
+const MemberManagerModal = lazy(() =>
+  import('./components/MemberManagerModal').then((m) => ({ default: m.MemberManagerModal }))
+);
+const GroupSelectorModal = lazy(() =>
+  import('./components/GroupSelectorModal').then((m) => ({ default: m.GroupSelectorModal }))
+);
+const RenameTripModal = lazy(() =>
+  import('./components/RenameTripModal').then((m) => ({ default: m.RenameTripModal }))
+);
+
+const ModalFallback = () => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/40">
+    <div className="w-8 h-8 rounded-full border-2 border-neutral-300 border-t-emerald-600 animate-spin" />
+  </div>
+);
 
 const STORAGE_KEY_GROUPS = 'splitwise_groups_v3';
 const STORAGE_KEY_ACTIVE_GROUP_ID = 'splitwise_active_group_id_v3';
@@ -133,6 +154,22 @@ export default function App() {
         setGroups(durableGroups);
       }
     });
+    // Honor PWA shortcut launches (manifest shortcuts): ?tab=settlement / ?action=add-expense
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('tab') === 'settlement') {
+        setActiveTab('settlement');
+      }
+      if (params.get('action') === 'add-expense') {
+        setEditingExpense(null);
+        setIsExpenseModalOpen(true);
+      }
+      if (params.size > 0) {
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }, []);
 
   // Sync state to storage (both IndexedDB durable storage and localStorage warm cache)
@@ -412,6 +449,8 @@ export default function App() {
     <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans transition-colors">
       {/* Offline Status Floating Indicator */}
       <OfflineIndicator lang={lang} />
+      {/* Service Worker update / offline-ready prompts */}
+      <PWAUpdatePrompt lang={lang} />
 
       {/* Toast Notification */}
       {toastMessage && (
@@ -733,7 +772,8 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Modals */}
+      {/* Modals (code-split) */}
+      <Suspense fallback={<ModalFallback />}>
       {isExpenseModalOpen && (
         <ExpenseModal
           isOpen={isExpenseModalOpen}
@@ -814,6 +854,7 @@ export default function App() {
           lang={lang}
         />
       )}
+      </Suspense>
     </div>
   );
 }
