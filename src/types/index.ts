@@ -53,7 +53,7 @@ export type SettlementMode = 'direct_optimized' | 'hub_collector';
 export interface Group {
   id: string;
   name: string;
-  currency: string; // e.g. '$', '€', '£', '₫'
+  currency: string; // ISO 4217 code, e.g. 'USD', 'VND', 'EUR'
   createdAt: string;
   collectorId?: string; // Optional designated collector
   members: Member[];

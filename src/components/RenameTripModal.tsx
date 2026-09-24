@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Edit2, DollarSign } from 'lucide-react';
+import { X, Edit2 } from 'lucide-react';
 import { Group } from '../types';
 import { Language, TRANSLATIONS } from '../utils/i18n';
+import { CURRENCIES, normalizeCurrencyCode } from '../utils/currency';
 
 interface RenameTripModalProps {
   isOpen: boolean;
@@ -10,8 +11,6 @@ interface RenameTripModalProps {
   lang: Language;
   onSave: (newName: string, newCurrency: string) => void;
 }
-
-const COMMON_CURRENCIES = ['$', '₫', '€', '£', '¥', 'A$', 'C$', 'CHF', 'SGD'];
 
 export const RenameTripModal: React.FC<RenameTripModalProps> = ({
   isOpen,
@@ -22,11 +21,11 @@ export const RenameTripModal: React.FC<RenameTripModalProps> = ({
 }) => {
   const t = TRANSLATIONS[lang];
   const [name, setName] = useState(group.name);
-  const [currency, setCurrency] = useState(group.currency || '$');
+  const [currency, setCurrency] = useState(normalizeCurrencyCode(group.currency));
 
   useEffect(() => {
     setName(group.name);
-    setCurrency(group.currency || '$');
+    setCurrency(normalizeCurrencyCode(group.currency));
   }, [group, isOpen]);
 
   if (!isOpen) return null;
@@ -74,19 +73,19 @@ export const RenameTripModal: React.FC<RenameTripModalProps> = ({
             <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
               {t.currencySymbolLabel}
             </label>
-            <div className="grid grid-cols-5 gap-1.5 pt-1">
-              {COMMON_CURRENCIES.map((c) => (
+            <div className="grid grid-cols-3 gap-1.5 pt-1 max-h-44 overflow-y-auto">
+              {CURRENCIES.map((c) => (
                 <button
-                  key={c}
+                  key={c.code}
                   type="button"
-                  onClick={() => setCurrency(c)}
-                  className={`py-1.5 text-xs font-mono font-bold rounded-lg border transition-all ${
-                    currency === c
+                  onClick={() => setCurrency(c.code)}
+                  className={`py-1.5 px-1 text-xs font-mono font-bold rounded-lg border transition-all ${
+                    currency === c.code
                       ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-600'
                       : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600'
                   }`}
                 >
-                  {c}
+                  {c.code} <span className="font-normal opacity-70">({c.symbol})</span>
                 </button>
               ))}
             </div>

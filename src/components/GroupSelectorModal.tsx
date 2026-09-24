@@ -5,16 +5,13 @@ import {
   Trash2,
   Download,
   Upload,
-  RefreshCw,
   Edit2,
   Check,
-  Globe,
-  DollarSign,
   Database,
   ShieldCheck,
 } from 'lucide-react';
 import { Group } from '../types';
-import { formatCurrency } from '../utils/currency';
+import { formatCurrency, CURRENCIES, DEFAULT_CURRENCY, normalizeCurrencyCode } from '../utils/currency';
 import { Language, TRANSLATIONS } from '../utils/i18n';
 import { getStorageStatus, requestPersistentStorage, StorageStatus } from '../utils/persistentStorage';
 
@@ -28,12 +25,9 @@ interface GroupSelectorModalProps {
   onCreateGroup: (name: string, currency: string, initialMemberCount: number) => void;
   onUpdateGroupDetails: (groupId: string, newName: string, newCurrency: string) => void;
   onDeleteGroup: (groupId: string) => void;
-  onResetSample: () => void;
   onExportAllJson: () => void;
   onImportJson: (jsonData: string) => void;
 }
-
-const CURRENCIES = ['$', '₫', '€', '£', '¥', 'A$', 'C$', 'CHF', 'SGD'];
 
 export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
   isOpen,
@@ -45,7 +39,6 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
   onCreateGroup,
   onUpdateGroupDetails,
   onDeleteGroup,
-  onResetSample,
   onExportAllJson,
   onImportJson,
 }) => {
@@ -53,13 +46,13 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
 
   const [isCreating, setIsCreating] = useState(false);
   const [name, setName] = useState('');
-  const [currency, setCurrency] = useState('$');
+  const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
   const [memberCount, setMemberCount] = useState<number>(0); // Default 0 as requested
 
   // Editing existing trip
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
-  const [editCurrency, setEditCurrency] = useState('$');
+  const [editCurrency, setEditCurrency] = useState(DEFAULT_CURRENCY);
 
   const [errorMsg, setErrorMsg] = useState('');
   const [storageStatus, setStorageStatus] = useState<StorageStatus | null>(null);
@@ -84,7 +77,7 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
       setErrorMsg(lang === 'vi' ? 'Vui lòng nhập tên chuyến đi' : 'Please enter a trip name');
       return;
     }
-    onCreateGroup(name.trim(), currency.trim() || '$', Math.max(0, Math.floor(memberCount)));
+    onCreateGroup(name.trim(), normalizeCurrencyCode(currency), Math.max(0, Math.floor(memberCount)));
     setIsCreating(false);
     setName('');
     setMemberCount(0);
@@ -94,7 +87,7 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
   const startEditGroup = (g: Group) => {
     setEditingGroupId(g.id);
     setEditName(g.name);
-    setEditCurrency(g.currency || '$');
+    setEditCurrency(normalizeCurrencyCode(g.currency));
   };
 
   const handleSaveEdit = (groupId: string) => {
@@ -179,8 +172,8 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
                     className="w-full px-3 py-1.5 text-xs bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-emerald-600 dark:focus:border-emerald-400 dark:focus:bg-neutral-800"
                   >
                     {CURRENCIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
+                      <option key={c.code} value={c.code}>
+                        {c.code} ({c.symbol}) — {c.name}
                       </option>
                     ))}
                   </select>
@@ -258,11 +251,11 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
                       <select
                         value={editCurrency}
                         onChange={(e) => setEditCurrency(e.target.value)}
-                        className="w-16 px-1.5 py-1 text-xs bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-neutral-900 dark:text-neutral-100 focus:border-emerald-600 dark:focus:border-emerald-400 dark:focus:bg-neutral-800 focus:outline-none"
+                        className="w-24 px-1.5 py-1 text-xs bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-neutral-900 dark:text-neutral-100 focus:border-emerald-600 dark:focus:border-emerald-400 dark:focus:bg-neutral-800 focus:outline-none"
                       >
                         {CURRENCIES.map((c) => (
-                          <option key={c} value={c}>
-                            {c}
+                          <option key={c.code} value={c.code}>
+                            {c.code} ({c.symbol})
                           </option>
                         ))}
                       </select>
@@ -338,20 +331,18 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
 
-                      {groups.length > 1 && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (confirm(lang === 'vi' ? `Bạn có chắc muốn xoá chuyến đi "${g.name}"?` : `Delete group "${g.name}"?`)) {
-                              onDeleteGroup(g.id);
-                            }
-                          }}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm(lang === 'vi' ? `Bạn có chắc muốn xoá chuyến đi "${g.name}"?` : `Delete group "${g.name}"?`)) {
+                            onDeleteGroup(g.id);
+                          }
+                        }}
                           className="p-1 text-neutral-400 dark:text-neutral-500 hover:text-red-600 dark:hover:text-red-400 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
                           title="Delete trip"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -428,19 +419,6 @@ export const GroupSelectorModal: React.FC<GroupSelectorModalProps> = ({
                 />
               </label>
             </div>
-
-            <button
-              onClick={() => {
-                if (confirm(lang === 'vi' ? 'Khôi phục chuyến đi mẫu?' : 'Restore sample trip?')) {
-                  onResetSample();
-                  onClose();
-                }
-              }}
-              className="w-full text-center text-xs text-neutral-500 dark:text-neutral-400 hover:text-emerald-700 dark:hover:text-emerald-400 py-1.5 flex items-center justify-center gap-1 transition-colors"
-            >
-              <RefreshCw className="w-3 h-3" />
-              <span>{t.restoreSampleBtn}</span>
-            </button>
           </div>
         </div>
 

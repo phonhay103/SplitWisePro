@@ -8,12 +8,12 @@ import {
   ChevronDown,
   Globe,
   Edit2,
-  DollarSign,
   Sun,
   Moon,
 } from 'lucide-react';
 import { Group } from '../types';
 import { Language, TRANSLATIONS } from '../utils/i18n';
+import { CURRENCIES } from '../utils/currency';
 import { PWAInstallButton } from './PWAInstallButton';
 
 interface HeaderProps {
@@ -30,8 +30,6 @@ interface HeaderProps {
   onOpenSummaryReport: () => void;
   onOpenRenameTrip: () => void;
 }
-
-const COMMON_CURRENCIES = ['$', '₫', '€', '£', '¥', 'SGD', 'THB', 'A$', 'C$'];
 
 export const Header: React.FC<HeaderProps> = ({
   currentGroup,
@@ -139,22 +137,24 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             {showCurrencyDropdown && (
-              <div className="absolute right-0 mt-1 py-1 w-24 bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 z-50 animate-in fade-in duration-100">
-                {COMMON_CURRENCIES.map((c) => (
+              <div className="absolute right-0 mt-1 py-1 w-40 bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 z-50 animate-in fade-in duration-100 max-h-64 overflow-y-auto">
+                {CURRENCIES.map((c) => (
                   <button
-                    key={c}
+                    key={c.code}
                     onClick={() => {
-                      onChangeCurrency(c);
+                      onChangeCurrency(c.code);
                       setShowCurrencyDropdown(false);
                     }}
-                    className={`w-full px-3 py-1.5 text-xs text-left font-mono font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center justify-between ${
-                      currentGroup.currency === c
+                    className={`w-full px-3 py-1.5 text-xs text-left font-mono font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center justify-between gap-2 ${
+                      currentGroup.currency === c.code
                         ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/30'
                         : 'text-neutral-700 dark:text-neutral-300'
                     }`}
                   >
-                    <span>{c}</span>
-                    {currentGroup.currency === c && <span>✓</span>}
+                    <span>
+                      {c.code} <span className="text-neutral-400 dark:text-neutral-500">({c.symbol})</span>
+                    </span>
+                    {currentGroup.currency === c.code && <span>✓</span>}
                   </button>
                 ))}
               </div>

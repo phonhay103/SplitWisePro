@@ -128,14 +128,13 @@ export const TRANSLATIONS = {
     tripNamePlaceholder: 'e.g. Da Lat Trip, Roommates, Summer Vacation...',
     initialMemberCountLabel: 'Number of Initial Members (Optional)',
     initialMemberCountHelp: 'Generates default members (Member 1, 2...) you can rename anytime. Leave 0 for empty.',
-    currencySymbolLabel: 'Currency Symbol',
+    currencySymbolLabel: 'Currency (ISO Code)',
     createTripSubmit: 'Create Trip',
     editTripModalTitle: 'Edit Trip Details',
     saveTripDetails: 'Save Details',
     backupDataTitle: 'Data & Backup',
     backupJsonBtn: 'Backup (JSON)',
     importJsonBtn: 'Import JSON',
-    restoreSampleBtn: 'Load Sample Trip',
     activeBadge: 'Active',
 
     // Member Personal Report Modal
@@ -290,14 +289,13 @@ export const TRANSLATIONS = {
     tripNamePlaceholder: 'VD: Du lịch Đà Lạt, Ăn trưa văn phòng, Sinh nhật...',
     initialMemberCountLabel: 'Số lượng thành viên ban đầu (Tùy chọn)',
     initialMemberCountHelp: 'Hệ thống sẽ tạo sẵn Thành viên 1, 2... để bạn đổi tên sau. Để trống nếu muốn nhập từ đầu.',
-    currencySymbolLabel: 'Ký hiệu tiền tệ',
+    currencySymbolLabel: 'Tiền tệ (mã ISO)',
     createTripSubmit: 'Tạo chuyến đi',
     editTripModalTitle: 'Chỉnh sửa thông tin chuyến đi',
     saveTripDetails: 'Lưu thay đổi',
     backupDataTitle: 'Sao lưu & Dữ liệu',
     backupJsonBtn: 'Tải file sao lưu (JSON)',
     importJsonBtn: 'Nạp file JSON',
-    restoreSampleBtn: 'Nạp chuyến đi mẫu',
     activeBadge: 'Đang xem',
 
     // Member Personal Report Modal

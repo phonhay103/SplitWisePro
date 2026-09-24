@@ -14,8 +14,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 import { Group, Expense, Member, SettlementMode } from './types';
-import { SAMPLE_GROUP } from './data/sampleData';
-import { formatCurrency } from './utils/currency';
+import { formatCurrency, normalizeCurrencyCode } from './utils/currency';
 import { calculateMemberBalances, computeOptimizedSettlements } from './utils/debtSettlement';
 import { generateGroupSummaryText } from './utils/exportUtils';
 import { Language, TRANSLATIONS } from './utils/i18n';
@@ -86,7 +85,7 @@ export default function App() {
 
   const t = TRANSLATIONS[lang];
 
-  // Groups state
+  // Groups state (no sample data — starts empty, user creates their own trips)
   const [groups, setGroups] = useState<Group[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY_GROUPS);
@@ -99,7 +98,7 @@ export default function App() {
     } catch (e) {
       console.error('Failed to load groups from storage', e);
     }
-    return [SAMPLE_GROUP];
+    return [];
   });
 
   const [currentGroupId, setCurrentGroupId] = useState<string>(() => {
@@ -111,11 +110,11 @@ export default function App() {
     } catch (e) {
       console.error(e);
     }
-    return groups[0]?.id || SAMPLE_GROUP.id;
+    return groups[0]?.id || '';
   });
 
   const currentGroup = useMemo(() => {
-    return groups.find((g) => g.id === currentGroupId) || groups[0] || SAMPLE_GROUP;
+    return groups.find((g) => g.id === currentGroupId) || groups[0];
   }, [groups, currentGroupId]);
 
   // Last payer memory across continuous entries
@@ -151,7 +150,15 @@ export default function App() {
     requestPersistentStorage();
     loadPersistentGroups(groups).then((durableGroups) => {
       if (durableGroups && durableGroups.length > 0) {
-        setGroups(durableGroups);
+        // One-time migration: legacy symbol currencies -> ISO 4217 codes.
+        const normalized = durableGroups.map((g) => ({
+          ...g,
+          currency: normalizeCurrencyCode(g.currency),
+        }));
+        setGroups(normalized);
+      } else {
+        // No data at all — guide the user to create their first trip.
+        setIsGroupSelectorOpen(true);
       }
     });
     // Honor PWA shortcut launches (manifest shortcuts): ?tab=settlement / ?action=add-expense
@@ -160,7 +167,7 @@ export default function App() {
       if (params.get('tab') === 'settlement') {
         setActiveTab('settlement');
       }
-      if (params.get('action') === 'add-expense') {
+      if (params.get('action') === 'add-expense' && groups.length > 0) {
         setEditingExpense(null);
         setIsExpenseModalOpen(true);
       }
@@ -195,23 +202,27 @@ export default function App() {
 
   // Member Balances
   const memberBalances = useMemo(() => {
+    if (!currentGroup) return [];
     return calculateMemberBalances(currentGroup.members, currentGroup.expenses);
-  }, [currentGroup.members, currentGroup.expenses]);
+  }, [currentGroup]);
 
   // Optimal Settlements
   const settlementResult = useMemo(() => {
+    if (!currentGroup) return { transactions: [], debtorTransferCounts: {}, maxTransfersPerDebtor: 0 };
     return computeOptimizedSettlements(
       memberBalances,
       settlementMode,
       currentGroup.collectorId,
       currentGroup.settlementsPaid || {}
     );
-  }, [memberBalances, settlementMode, currentGroup.collectorId, currentGroup.settlementsPaid]);
+  }, [memberBalances, settlementMode, currentGroup]);
 
   const updateCurrentGroup = (updater: (prev: Group) => Group) => {
+    if (!currentGroup) return;
+    const targetId = currentGroup.id;
     setGroups((prevGroups) =>
       prevGroups.map((g) => {
-        if (g.id === currentGroup.id) {
+        if (g.id === targetId) {
           return updater(g);
         }
         return g;
@@ -223,17 +234,18 @@ export default function App() {
   const handleChangeCurrency = (newCurrency: string) => {
     updateCurrentGroup((prev) => ({
       ...prev,
-      currency: newCurrency,
+      currency: normalizeCurrencyCode(newCurrency),
     }));
-    showToast(lang === 'vi' ? `Đã đổi tiền tệ sang ${newCurrency}` : `Currency changed to ${newCurrency}`);
+    showToast(lang === 'vi' ? `Đã đổi tiền tệ sang ${normalizeCurrencyCode(newCurrency)}` : `Currency changed to ${normalizeCurrencyCode(newCurrency)}`);
   };
 
   // Trip name & currency update
   const handleUpdateTripDetails = (groupId: string, newName: string, newCurrency: string) => {
+    const code = normalizeCurrencyCode(newCurrency);
     setGroups((prev) =>
       prev.map((g) => {
         if (g.id === groupId) {
-          return { ...g, name: newName, currency: newCurrency };
+          return { ...g, name: newName, currency: code };
         }
         return g;
       })
@@ -387,7 +399,7 @@ export default function App() {
     const newGroup: Group = {
       id: `group-${Date.now()}`,
       name,
-      currency: currency || '$',
+      currency: normalizeCurrencyCode(currency),
       createdAt: new Date().toISOString().slice(0, 10),
       members: initialMembers,
       expenses: [],
@@ -401,19 +413,11 @@ export default function App() {
 
   const handleDeleteGroup = (groupId: string) => {
     const remaining = groups.filter((g) => g.id !== groupId);
-    if (remaining.length > 0) {
-      setGroups(remaining);
-      if (currentGroupId === groupId) {
-        setCurrentGroupId(remaining[0].id);
-      }
-      showToast(lang === 'vi' ? 'Đã xoá chuyến đi' : 'Trip deleted');
+    setGroups(remaining);
+    if (currentGroupId === groupId) {
+      setCurrentGroupId(remaining[0]?.id || '');
     }
-  };
-
-  const handleResetSample = () => {
-    setGroups([SAMPLE_GROUP]);
-    setCurrentGroupId(SAMPLE_GROUP.id);
-    showToast(lang === 'vi' ? 'Đã khôi phục dữ liệu mẫu' : 'Restored sample group');
+    showToast(lang === 'vi' ? 'Đã xoá chuyến đi' : 'Trip deleted');
   };
 
   const handleExportAllJson = () => {
@@ -432,8 +436,12 @@ export default function App() {
     try {
       const parsed = JSON.parse(content);
       if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].members) {
-        setGroups(parsed);
-        setCurrentGroupId(parsed[0].id);
+        const normalized = (parsed as Group[]).map((g) => ({
+          ...g,
+          currency: normalizeCurrencyCode(g.currency),
+        }));
+        setGroups(normalized);
+        setCurrentGroupId(normalized[0].id);
         showToast(lang === 'vi' ? 'Đã nạp dữ liệu thành công' : 'Data imported successfully');
       } else {
         alert(lang === 'vi' ? 'Định dạng file sao lưu không hợp lệ.' : 'Invalid backup format.');
@@ -443,7 +451,74 @@ export default function App() {
     }
   };
 
-  const totalSpent = currentGroup.expenses.reduce((s, e) => s + e.amount, 0);
+  const totalSpent = (currentGroup?.expenses ?? []).reduce((s, e) => s + e.amount, 0);
+
+  // Empty state — no trips yet (no sample data bundled)
+  if (!currentGroup) {
+    return (
+      <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans transition-colors">
+        <OfflineIndicator lang={lang} />
+        <PWAUpdatePrompt lang={lang} />
+
+        {toastMessage && (
+          <div className="fixed bottom-6 right-6 z-50 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 text-xs font-semibold px-4 py-2.5 rounded-xl shadow-xl border border-neutral-700 dark:border-neutral-300 animate-in fade-in slide-in-from-bottom-2 duration-200">
+            {toastMessage}
+          </div>
+        )}
+
+        <main className="flex-1 flex items-center justify-center px-4 py-12">
+          <div className="max-w-md w-full text-center space-y-5">
+            <div className="w-16 h-16 rounded-2xl bg-emerald-600 text-white mx-auto flex items-center justify-center shadow-lg">
+              <Receipt className="w-8 h-8" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">
+                {lang === 'vi' ? 'Chia tiền nhóm dễ dàng' : 'Split group expenses effortlessly'}
+              </h1>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">
+                {lang === 'vi'
+                  ? 'Tạo chuyến đi đầu tiên để bắt đầu ghi chép chi tiêu và tối ưu thanh toán nợ.'
+                  : 'Create your first trip to start tracking expenses and optimizing settlements.'}
+              </p>
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <button
+                onClick={() => setIsGroupSelectorOpen(true)}
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors shadow-md"
+              >
+                <Plus className="w-4 h-4" />
+                {lang === 'vi' ? 'Tạo chuyến đi' : 'Create trip'}
+              </button>
+              <button
+                onClick={handleToggleLanguage}
+                className="px-4 py-2.5 text-sm font-bold text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700 rounded-xl transition-colors"
+              >
+                {lang === 'en' ? 'Tiếng Việt' : 'English'}
+              </button>
+            </div>
+          </div>
+        </main>
+
+        {isGroupSelectorOpen && (
+          <Suspense fallback={<ModalFallback />}>
+            <GroupSelectorModal
+              isOpen={isGroupSelectorOpen}
+              onClose={() => setIsGroupSelectorOpen(false)}
+              groups={groups}
+              currentGroupId={currentGroupId}
+              lang={lang}
+              onSelectGroup={(id) => setCurrentGroupId(id)}
+              onCreateGroup={handleCreateGroup}
+              onUpdateGroupDetails={handleUpdateTripDetails}
+              onDeleteGroup={handleDeleteGroup}
+              onExportAllJson={handleExportAllJson}
+              onImportJson={handleImportJson}
+            />
+          </Suspense>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans transition-colors">
@@ -826,7 +901,6 @@ export default function App() {
           onCreateGroup={handleCreateGroup}
           onUpdateGroupDetails={handleUpdateTripDetails}
           onDeleteGroup={handleDeleteGroup}
-          onResetSample={handleResetSample}
           onExportAllJson={handleExportAllJson}
           onImportJson={handleImportJson}
         />
