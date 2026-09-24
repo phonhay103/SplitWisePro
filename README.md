@@ -1,4 +1,4 @@
-# ChiaTien Pro — Group Expense Splitter & 1-Transfer Debt Settlement
+# SplitWisePro — Group Expense Splitter & 1-Transfer Debt Settlement
 
 Smart group expense splitter: supports multiple payers per expense, flexible
 subgroup sharing, automatic settlement optimization so **each person transfers
@@ -74,3 +74,7 @@ public/                     # PWA icons
 - Data lives **in each device's browser** (no cloud sync). To move devices,
   use the JSON backup feature in the Group Selector.
 - All calculations run client-side; no data is sent anywhere.
+
+## License
+
+Apache-2.0 — see [LICENSE](./LICENSE).
