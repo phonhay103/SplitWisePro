@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Plus,
   Users,
   Receipt,
   ArrowRightLeft,
@@ -26,7 +25,6 @@ interface HeaderProps {
   onSetLanguage: (lang: Language) => void;
   onToggleTheme: () => void;
   onChangeCurrency: (newCurrency: string) => void;
-  onOpenAddExpense: () => void;
   onOpenGroupSelector: () => void;
   onOpenSummaryReport: () => void;
   onOpenRenameTrip: () => void;
@@ -41,7 +39,6 @@ export const Header: React.FC<HeaderProps> = ({
   onSetLanguage,
   onToggleTheme,
   onChangeCurrency,
-  onOpenAddExpense,
   onOpenGroupSelector,
   onOpenSummaryReport,
   onOpenRenameTrip,
@@ -190,16 +187,6 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <FileText className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400" />
             <span>{t.summaryReportBtn}</span>
-          </button>
-
-          {/* Add Expense Button */}
-          <button
-            onClick={onOpenAddExpense}
-            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors whitespace-nowrap shadow-xs"
-          >
-            <Plus className="w-4 h-4" />
-            <span className="hidden xs:inline">{t.addExpenseBtn}</span>
-            <span className="xs:hidden">{t.addShortBtn}</span>
           </button>
         </div>
       </div>

@@ -535,10 +535,6 @@ export default function App() {
         onSetLanguage={handleSetLanguage}
         onToggleTheme={handleToggleTheme}
         onChangeCurrency={handleChangeCurrency}
-        onOpenAddExpense={() => {
-          setEditingExpense(null);
-          setIsExpenseModalOpen(true);
-        }}
         onOpenGroupSelector={() => setIsGroupSelectorOpen(true)}
         onOpenSummaryReport={() => setIsSummaryReportOpen(true)}
         onOpenRenameTrip={() => setIsRenameTripOpen(true)}
