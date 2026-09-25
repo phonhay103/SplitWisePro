@@ -283,6 +283,18 @@ const en = {
     completedCountLabel: 'completed',
     pendingStatus: 'Pending',
     copiedReportToast: 'Copied summary!',
+
+    // Privacy / Analytics (opt-in by default, opt-out anytime)
+    privacyAnalyticsTitle: 'Usage analytics',
+    privacyAnalyticsDesc: 'Anonymous usage stats help improve the app. No names, notes, or payment details are ever sent. On by default — you can opt out anytime.',
+    analyticsOn: 'On',
+    analyticsOff: 'Off',
+
+    // Settings (grouped: appearance, privacy, data)
+    settingsTitle: 'Settings',
+    settingsAppearance: 'Appearance',
+    settingsPrivacy: 'Privacy & Analytics',
+    settingsData: 'Data & Storage',
 };
 
 const vi = {
@@ -568,6 +580,18 @@ const vi = {
     completedCountLabel: 'đã chuyển',
     pendingStatus: 'Chưa chuyển',
     copiedReportToast: 'Đã sao chép tin nhắn!',
+
+    // Privacy / Analytics (mặc định bật, có thể tắt bất cứ lúc nào)
+    privacyAnalyticsTitle: 'Phân tích sử dụng',
+    privacyAnalyticsDesc: 'Thống kê ẩn danh giúp cải thiện app. Không bao giờ gửi tên, ghi chú hay thông tin thanh toán. Mặc định bật — bạn có thể tắt bất cứ lúc nào.',
+    analyticsOn: 'Bật',
+    analyticsOff: 'Tắt',
+
+    // Settings (gom nhóm: giao diện, riêng tư, dữ liệu)
+    settingsTitle: 'Cài đặt',
+    settingsAppearance: 'Giao diện',
+    settingsPrivacy: 'Riêng tư & Phân tích',
+    settingsData: 'Dữ liệu & Lưu trữ',
 };
 
 const es = {
@@ -853,6 +877,18 @@ const es = {
     completedCountLabel: 'completadas',
     pendingStatus: 'Pendiente',
     copiedReportToast: '¡Resumen copiado!',
+
+    // Privacy / Analytics (opt-in by default, opt-out anytime)
+    privacyAnalyticsTitle: 'Analíticas de uso',
+    privacyAnalyticsDesc: 'Las estadísticas anónimas ayudan a mejorar la app. Nunca se envían nombres, notas ni datos de pago. Activado por defecto — puedes desactivarlo cuando quieras.',
+    analyticsOn: 'Sí',
+    analyticsOff: 'No',
+
+    // Settings (grouped: appearance, privacy, data)
+    settingsTitle: 'Ajustes',
+    settingsAppearance: 'Apariencia',
+    settingsPrivacy: 'Privacidad y analíticas',
+    settingsData: 'Datos y almacenamiento',
 };
 
 const fr = {
@@ -1138,6 +1174,18 @@ const fr = {
     completedCountLabel: 'terminés',
     pendingStatus: 'En attente',
     copiedReportToast: 'Résumé copié !',
+
+    // Privacy / Analytics (opt-in by default, opt-out anytime)
+    privacyAnalyticsTitle: "Données d'utilisation",
+    privacyAnalyticsDesc: "Les statistiques anonymes aident à améliorer l'app. Aucun nom, note ou donnée de paiement n'est envoyé. Activé par défaut — désactivable à tout moment.",
+    analyticsOn: 'Oui',
+    analyticsOff: 'Non',
+
+    // Settings (grouped: appearance, privacy, data)
+    settingsTitle: 'Paramètres',
+    settingsAppearance: 'Apparence',
+    settingsPrivacy: 'Confidentialité et analyses',
+    settingsData: 'Données et stockage',
 };
 
 const de = {
@@ -1423,6 +1471,18 @@ const de = {
     completedCountLabel: 'abgeschlossen',
     pendingStatus: 'Ausstehend',
     copiedReportToast: 'Zusammenfassung kopiert!',
+
+    // Privacy / Analytics (opt-in by default, opt-out anytime)
+    privacyAnalyticsTitle: 'Nutzungsanalyse',
+    privacyAnalyticsDesc: 'Anonyme Nutzungsstatistiken helfen, die App zu verbessern. Namen, Notizen oder Zahlungsdaten werden nie gesendet. Standardmäßig aktiv — jederzeit deaktivierbar.',
+    analyticsOn: 'An',
+    analyticsOff: 'Aus',
+
+    // Settings (grouped: appearance, privacy, data)
+    settingsTitle: 'Einstellungen',
+    settingsAppearance: 'Darstellung',
+    settingsPrivacy: 'Datenschutz & Analyse',
+    settingsData: 'Daten & Speicherung',
 };
 
 const pt = {
@@ -1708,6 +1768,18 @@ const pt = {
     completedCountLabel: 'concluídas',
     pendingStatus: 'Pendente',
     copiedReportToast: 'Resumo copiado!',
+
+    // Privacy / Analytics (opt-in by default, opt-out anytime)
+    privacyAnalyticsTitle: 'Análise de uso',
+    privacyAnalyticsDesc: 'Estatísticas anônimas ajudam a melhorar o app. Nomes, notas ou dados de pagamento nunca são enviados. Ativado por padrão — pode desativar quando quiser.',
+    analyticsOn: 'Sim',
+    analyticsOff: 'Não',
+
+    // Settings (grouped: appearance, privacy, data)
+    settingsTitle: 'Configurações',
+    settingsAppearance: 'Aparência',
+    settingsPrivacy: 'Privacidade e análises',
+    settingsData: 'Dados e armazenamento',
 };
 
 const zh = {
@@ -1993,6 +2065,18 @@ const zh = {
     completedCountLabel: '已完成',
     pendingStatus: '待转账',
     copiedReportToast: '汇总已复制！',
+
+    // Privacy / Analytics (opt-in by default, opt-out anytime)
+    privacyAnalyticsTitle: '使用情况分析',
+    privacyAnalyticsDesc: '匿名使用统计有助于改进应用。从不发送姓名、备注或付款信息。默认开启——您可随时关闭。',
+    analyticsOn: '开',
+    analyticsOff: '关',
+
+    // Settings (grouped: appearance, privacy, data)
+    settingsTitle: '设置',
+    settingsAppearance: '外观',
+    settingsPrivacy: '隐私与分析',
+    settingsData: '数据与存储',
 };
 
 const ja = {
@@ -2278,6 +2362,18 @@ const ja = {
     completedCountLabel: '完了',
     pendingStatus: '未送金',
     copiedReportToast: 'サマリーをコピーしました！',
+
+    // Privacy / Analytics (opt-in by default, opt-out anytime)
+    privacyAnalyticsTitle: '利用状況分析',
+    privacyAnalyticsDesc: '匿名の利用統計はアプリ改善に役立ちます。名前・メモ・支払い情報が送信されることはありません。デフォルトでオン——いつでもオフにできます。',
+    analyticsOn: 'オン',
+    analyticsOff: 'オフ',
+
+    // Settings (grouped: appearance, privacy, data)
+    settingsTitle: '設定',
+    settingsAppearance: '外観',
+    settingsPrivacy: 'プライバシーと分析',
+    settingsData: 'データとストレージ',
 };
 
 const ko = {
@@ -2563,6 +2659,18 @@ const ko = {
     completedCountLabel: '완료',
     pendingStatus: '대기 중',
     copiedReportToast: '요약을 복사했습니다!',
+
+    // Privacy / Analytics (opt-in by default, opt-out anytime)
+    privacyAnalyticsTitle: '사용 분석',
+    privacyAnalyticsDesc: '익명 사용 통계는 앱 개선에 도움이 됩니다. 이름, 메모, 결제 정보는 절대 전송되지 않습니다. 기본적으로 켜져 있으며 언제든 끌 수 있습니다.',
+    analyticsOn: '켬',
+    analyticsOff: '끔',
+
+    // Settings (grouped: appearance, privacy, data)
+    settingsTitle: '설정',
+    settingsAppearance: '모양',
+    settingsPrivacy: '개인정보 및 분석',
+    settingsData: '데이터 및 저장소',
 };
 
 export type Translation = typeof en;

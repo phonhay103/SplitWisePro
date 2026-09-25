@@ -16,6 +16,7 @@
     "@vitejs/plugin-react": "^6.1.1",
     "idb-keyval": "^6.3.0",
     "lucide-react": "^0.546.0",
+    "posthog-js": "^1.434.13",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "vite": "^8.3.0"

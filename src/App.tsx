@@ -19,6 +19,8 @@ import { calculateMemberBalances, computeOptimizedSettlements } from './utils/de
 import { generateGroupSummaryText } from './utils/exportUtils';
 import { Language, TRANSLATIONS, isSupportedLanguage, LOCALES } from './utils/i18n';
 import { loadPersistentGroups, savePersistentGroups, requestPersistentStorage } from './utils/persistentStorage';
+import { AnalyticsConsentToggle } from './components/AnalyticsConsentToggle';
+import { bucketAmount, bucketCount, trackEvent, trackPageView } from './utils/analytics';
 import { Header } from './components/Header';
 import { ExpenseList } from './components/ExpenseList';
 import { SettlementView } from './components/SettlementView';
@@ -44,6 +46,9 @@ const GroupSelectorModal = lazy(() =>
 );
 const RenameTripModal = lazy(() =>
   import('./components/RenameTripModal').then((m) => ({ default: m.RenameTripModal }))
+);
+const SettingsModal = lazy(() =>
+  import('./components/SettingsModal').then((m) => ({ default: m.SettingsModal }))
 );
 
 const ModalFallback = () => (
@@ -136,6 +141,7 @@ export default function App() {
   const [isMemberManagerOpen, setIsMemberManagerOpen] = useState(false);
   const [isGroupSelectorOpen, setIsGroupSelectorOpen] = useState(false);
   const [isRenameTripOpen, setIsRenameTripOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSummaryReportOpen, setIsSummaryReportOpen] = useState(false);
   const [selectedMemberReportId, setSelectedMemberReportId] = useState<string | null>(null);
 
@@ -178,6 +184,13 @@ export default function App() {
     } catch (e) {
       console.error(e);
     }
+  }, []);
+
+  // Analytics: app open (sanitized — no PII, no exact amounts).
+  useEffect(() => {
+    trackPageView();
+    trackEvent('app_opened', { lang });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Sync state to storage (both IndexedDB durable storage and localStorage warm cache)
@@ -260,6 +273,17 @@ export default function App() {
     setLang(nextLang);
   };
 
+  // Analytics-aware tab / settlement-mode switches (no PII).
+  const handleTabChange = (tab: 'expenses' | 'settlement' | 'members') => {
+    setActiveTab(tab);
+    trackEvent('tab_viewed', { tab });
+  };
+
+  const handleSettlementModeChange = (mode: SettlementMode) => {
+    setSettlementMode(mode);
+    trackEvent('settlement_viewed', { mode });
+  };
+
   // Theme toggle
   const handleToggleTheme = () => {
     const nextTheme = theme === 'light' ? 'dark' : 'light';
@@ -276,6 +300,16 @@ export default function App() {
       setLastPayerId(payerIdUsed);
     }
 
+    // Analytics (finance-safe: bucketed amount, no names/notes).
+    trackEvent('expense_added', {
+      amount_magnitude: bucketAmount(savedExpense.amount),
+      currency: currentGroup?.currency,
+      beneficiary_count: bucketCount(savedExpense.beneficiaries.length),
+      multi_payer: savedExpense.isMultiplePayers,
+      split_type: savedExpense.splitType,
+      is_edit: editingExpense !== null,
+    });
+
     updateCurrentGroup((prev) => {
       const exists = prev.expenses.some((e) => e.id === savedExpense.id);
       const newExpenses = exists
@@ -288,6 +322,7 @@ export default function App() {
   };
 
   const handleDeleteExpense = (expenseId: string) => {
+    trackEvent('expense_deleted');
     updateCurrentGroup((prev) => ({
       ...prev,
       expenses: prev.expenses.filter((e) => e.id !== expenseId),
@@ -365,6 +400,7 @@ export default function App() {
 
   const handleTogglePaid = (txId: string, fromId: string, toId: string) => {
     const key = `${fromId}->${toId}`;
+    trackEvent('settlement_marked_paid');
     updateCurrentGroup((prev) => {
       const paidMap = { ...(prev.settlementsPaid || {}) };
       paidMap[key] = !paidMap[key];
@@ -406,6 +442,10 @@ export default function App() {
 
     setGroups((prev) => [newGroup, ...prev]);
     setCurrentGroupId(newGroup.id);
+    trackEvent('group_created', {
+      member_count: bucketCount(initialMemberCount),
+      currency: normalizeCurrencyCode(currency),
+    });
     showToast(t.tripCreatedToast.replace('{name}', name));
   };
 
@@ -419,6 +459,7 @@ export default function App() {
   };
 
   const handleExportAllJson = () => {
+    trackEvent('report_exported', { format: 'json' });
     const dataStr = JSON.stringify(groups, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -487,6 +528,7 @@ export default function App() {
               </button>
               <LanguageDropdown lang={lang} onSelect={handleSetLanguage} variant="button" />
             </div>
+            <AnalyticsConsentToggle lang={lang} />
           </div>
         </main>
 
@@ -531,13 +573,14 @@ export default function App() {
         activeTab={activeTab}
         lang={lang}
         theme={theme}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         onSetLanguage={handleSetLanguage}
         onToggleTheme={handleToggleTheme}
         onChangeCurrency={handleChangeCurrency}
         onOpenGroupSelector={() => setIsGroupSelectorOpen(true)}
         onOpenSummaryReport={() => setIsSummaryReportOpen(true)}
         onOpenRenameTrip={() => setIsRenameTripOpen(true)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
       {/* Main Body */}
@@ -588,6 +631,7 @@ export default function App() {
                     lang
                   );
                   navigator.clipboard.writeText(summaryText);
+                  trackEvent('report_exported', { format: 'clipboard' });
                   showToast(t.copiedSummaryToast);
                 }}
                 className="px-3.5 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800/80 rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs"
@@ -651,7 +695,7 @@ export default function App() {
             mode={settlementMode}
             collectorId={currentGroup.collectorId}
             lang={lang}
-            onModeChange={setSettlementMode}
+            onModeChange={handleSettlementModeChange}
             onCollectorChange={handleSetCollector}
             onTogglePaid={handleTogglePaid}
             onOpenMemberReport={(memberId) => setSelectedMemberReportId(memberId)}
@@ -806,11 +850,12 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 py-6 mt-12 no-print transition-colors">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-center text-center text-xs text-neutral-500 dark:text-neutral-400">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col items-center justify-center gap-3 text-center text-xs text-neutral-500 dark:text-neutral-400">
           <div>
             <strong className="font-bold text-neutral-800 dark:text-neutral-200">{t.appName}{t.appSub}</strong> ·{' '}
             {t.footerTagline}
           </div>
+          <AnalyticsConsentToggle lang={lang} />
         </div>
       </footer>
 
@@ -854,6 +899,19 @@ export default function App() {
           group={currentGroup}
           lang={lang}
           onSave={(newName, newCurrency) => handleUpdateTripDetails(currentGroup.id, newName, newCurrency)}
+        />
+      )}
+
+      {isSettingsOpen && (
+        <SettingsModal
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          lang={lang}
+          theme={theme}
+          onToggleTheme={handleToggleTheme}
+          onSetLanguage={handleSetLanguage}
+          onExportAllJson={handleExportAllJson}
+          onImportJson={handleImportJson}
         />
       )}
 

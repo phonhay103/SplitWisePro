@@ -8,6 +8,7 @@ import {
   Edit2,
   Sun,
   Moon,
+  Settings,
 } from 'lucide-react';
 import { Group } from '../types';
 import { Language, TRANSLATIONS } from '../utils/i18n';
@@ -28,6 +29,7 @@ interface HeaderProps {
   onOpenGroupSelector: () => void;
   onOpenSummaryReport: () => void;
   onOpenRenameTrip: () => void;
+  onOpenSettings: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -42,6 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenGroupSelector,
   onOpenSummaryReport,
   onOpenRenameTrip,
+  onOpenSettings,
 }) => {
   const t = TRANSLATIONS[lang];
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
@@ -179,6 +182,16 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* In-App PWA Install Button */}
           <PWAInstallButton lang={lang} variant="header" />
+
+          {/* Settings */}
+          <button
+            onClick={onOpenSettings}
+            className="p-1.5 text-xs text-neutral-700 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors flex items-center justify-center"
+            title={t.settingsTitle}
+            aria-label={t.settingsTitle}
+          >
+            <Settings className="w-4 h-4 text-neutral-600 dark:text-neutral-300" />
+          </button>
 
           {/* Report Button */}
           <button
