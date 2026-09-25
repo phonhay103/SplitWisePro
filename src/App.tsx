@@ -19,7 +19,6 @@ import { calculateMemberBalances, computeOptimizedSettlements } from './utils/de
 import { generateGroupSummaryText } from './utils/exportUtils';
 import { Language, TRANSLATIONS, isSupportedLanguage, LOCALES } from './utils/i18n';
 import { loadPersistentGroups, savePersistentGroups, requestPersistentStorage } from './utils/persistentStorage';
-import { AnalyticsConsentToggle } from './components/AnalyticsConsentToggle';
 import { bucketAmount, bucketCount, trackEvent, trackPageView } from './utils/analytics';
 import { Header } from './components/Header';
 import { ExpenseList } from './components/ExpenseList';
@@ -528,7 +527,6 @@ export default function App() {
               </button>
               <LanguageDropdown lang={lang} onSelect={handleSetLanguage} variant="button" />
             </div>
-            <AnalyticsConsentToggle lang={lang} />
           </div>
         </main>
 
@@ -567,15 +565,13 @@ export default function App() {
         </div>
       )}
 
-      {/* Header with Language, Theme, Currency, Rename Trip buttons */}
+      {/* Header with Language, Currency, Rename Trip buttons (theme lives in Settings) */}
       <Header
         currentGroup={currentGroup}
         activeTab={activeTab}
         lang={lang}
-        theme={theme}
         onTabChange={handleTabChange}
         onSetLanguage={handleSetLanguage}
-        onToggleTheme={handleToggleTheme}
         onChangeCurrency={handleChangeCurrency}
         onOpenGroupSelector={() => setIsGroupSelectorOpen(true)}
         onOpenSummaryReport={() => setIsSummaryReportOpen(true)}
@@ -850,12 +846,11 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 py-6 mt-12 no-print transition-colors">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col items-center justify-center gap-3 text-center text-xs text-neutral-500 dark:text-neutral-400">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-center text-center text-xs text-neutral-500 dark:text-neutral-400">
           <div>
             <strong className="font-bold text-neutral-800 dark:text-neutral-200">{t.appName}{t.appSub}</strong> ·{' '}
             {t.footerTagline}
           </div>
-          <AnalyticsConsentToggle lang={lang} />
         </div>
       </footer>
 

@@ -143,18 +143,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </section>
 
-          {/* 2. Privacy & analytics (opt-in by default, opt-out anytime) */}
-          <section className="space-y-3 pt-4 border-t border-neutral-100 dark:border-neutral-800">
-            <SectionTitle icon={<ShieldCheck className="w-3.5 h-3.5" />}>{t.settingsPrivacy}</SectionTitle>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
-              {t.privacyAnalyticsDesc}
-            </p>
-            <div className="flex items-center justify-between gap-3 bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200 dark:border-neutral-700/60 rounded-xl px-3 py-2.5">
-              <AnalyticsConsentToggle lang={lang} />
-            </div>
-          </section>
-
-          {/* 3. Data & storage: backup/restore + persistence */}
+          {/* 2. Data & storage: backup/restore + persistence */}
           <section className="space-y-3 pt-4 border-t border-neutral-100 dark:border-neutral-800">
             <SectionTitle icon={<Database className="w-3.5 h-3.5" />}>{t.settingsData}</SectionTitle>
 
@@ -201,6 +190,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   {t.enablePersistBtn}
                 </button>
               )}
+            </div>
+          </section>
+
+          {/* 3. Privacy & analytics (opt-in by default, opt-out anytime) */}
+          <section className="space-y-3 pt-4 border-t border-neutral-100 dark:border-neutral-800">
+            <SectionTitle icon={<ShieldCheck className="w-3.5 h-3.5" />}>{t.settingsPrivacy}</SectionTitle>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
+              {t.privacyAnalyticsDesc}
+            </p>
+            <div className="flex items-center justify-between gap-3 bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200 dark:border-neutral-700/60 rounded-xl px-3 py-2.5">
+              <AnalyticsConsentToggle lang={lang} />
             </div>
           </section>
         </div>

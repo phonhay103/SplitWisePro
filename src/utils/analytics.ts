@@ -24,11 +24,12 @@ import { APP_ID, POSTHOG_CONFIG } from '../config';
  *   names/notes/payment handles/descriptions are dropped, amounts are sent
  *   as order-of-magnitude buckets, never exact values.
  *
- * CONSENT: default OPT-IN, user can OPT-OUT anytime (toggle in footer).
+ * CONSENT: default OPT-IN, user can OPT-OUT anytime (toggle in Settings).
  * - Initialized with opt_out_capturing_by_default: true, then opt-in ONLY if
- *   the user has not opted out and DNT is not set. This avoids leaking even
- *   a single auto-event before the opt-out flag is applied.
- * - DNT (Do Not Track) is always respected, even though default is opt-in.
+ *   the user has not opted out. This avoids leaking even a single auto-event
+ *   before the opt-out flag is applied.
+ * - The ONLY opt-out source is the user's toggle (persisted per app).
+ *   Browser Do Not Track (DNT) is deliberately ignored.
  */
 
 export const ANALYTICS_APP_ID: string = APP_ID;
@@ -109,17 +110,6 @@ function readOptOutFlag(): boolean {
   }
 }
 
-function isDntSet(): boolean {
-  try {
-    return (
-      navigator.doNotTrack === '1' ||
-      (window as unknown as { doNotTrack?: string }).doNotTrack === '1'
-    );
-  } catch {
-    return false;
-  }
-}
-
 function resolveKey(): string | undefined {
   return POSTHOG_CONFIG.key || undefined;
 }
@@ -139,9 +129,9 @@ export function isAnalyticsEnabled(): boolean {
   return !!resolveKey();
 }
 
-/** True when the user opted out (persisted per app) or DNT is set. */
+/** True when the user opted out via the Settings toggle (the only opt-out source). */
 export function isAnalyticsOptedOut(): boolean {
-  return readOptOutFlag() || isDntSet();
+  return readOptOutFlag();
 }
 
 /** True when events are actually being sent right now. */
@@ -168,7 +158,7 @@ export function subscribeConsentChange(listener: () => void): () => void {
 
 /**
  * Initialize PostHog once. Safe to call multiple times (idempotent per app id).
- * Default is OPT-IN: tracking starts unless the user opted out or DNT is set.
+ * Default is OPT-IN: tracking starts unless the user opted out.
  * Returns true when the SDK was initialized.
  */
 export function initAnalytics(): boolean {
@@ -192,7 +182,9 @@ export function initAnalytics(): boolean {
     disable_surveys: true,
     // Start opted-out, then opt in below only when allowed — no event leaks.
     opt_out_capturing_by_default: true,
-    respect_dnt: true,
+    // Browser Do Not Track is deliberately ignored — the Settings toggle
+    // is the single source of consent.
+    respect_dnt: false,
     persistence: 'localStorage',
     cross_subdomain_cookie: false,
     secure_cookie: true,
@@ -253,7 +245,7 @@ export function setAnalyticsOptedOut(optOut: boolean): void {
   }
   try {
     if (isInitialized()) {
-      if (optOut || isDntSet()) {
+      if (optOut) {
         posthog.opt_out_capturing();
       } else {
         posthog.opt_in_capturing();

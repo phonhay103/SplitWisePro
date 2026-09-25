@@ -6,14 +6,11 @@ import {
   FileText,
   ChevronDown,
   Edit2,
-  Sun,
-  Moon,
   Settings,
 } from 'lucide-react';
 import { Group } from '../types';
 import { Language, TRANSLATIONS } from '../utils/i18n';
 import { CURRENCIES } from '../utils/currency';
-import { PWAInstallButton } from './PWAInstallButton';
 import { LanguageDropdown } from './LanguageDropdown';
 import { useClickOutside } from '../hooks/useClickOutside';
 
@@ -21,10 +18,8 @@ interface HeaderProps {
   currentGroup: Group;
   activeTab: 'expenses' | 'settlement' | 'members';
   lang: Language;
-  theme: 'light' | 'dark';
   onTabChange: (tab: 'expenses' | 'settlement' | 'members') => void;
   onSetLanguage: (lang: Language) => void;
-  onToggleTheme: () => void;
   onChangeCurrency: (newCurrency: string) => void;
   onOpenGroupSelector: () => void;
   onOpenSummaryReport: () => void;
@@ -36,10 +31,8 @@ export const Header: React.FC<HeaderProps> = ({
   currentGroup,
   activeTab,
   lang,
-  theme,
   onTabChange,
   onSetLanguage,
-  onToggleTheme,
   onChangeCurrency,
   onOpenGroupSelector,
   onOpenSummaryReport,
@@ -165,23 +158,6 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Language Selector */}
           <LanguageDropdown lang={lang} onSelect={onSetLanguage} />
-
-          {/* Theme Toggle Light / Dark */}
-          <button
-            onClick={onToggleTheme}
-            className="p-1.5 text-xs text-neutral-700 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors flex items-center justify-center"
-            title={theme === 'dark' ? t.switchToLight : t.switchToDark}
-            aria-label={theme === 'dark' ? t.switchToLight : t.switchToDark}
-          >
-            {theme === 'dark' ? (
-              <Sun className="w-4 h-4 text-amber-400" />
-            ) : (
-              <Moon className="w-4 h-4 text-neutral-600" />
-            )}
-          </button>
-
-          {/* In-App PWA Install Button */}
-          <PWAInstallButton lang={lang} variant="header" />
 
           {/* Settings */}
           <button
