@@ -1,19 +1,18 @@
 import React from 'react';
 import { RefreshCw, WifiOff, X } from 'lucide-react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
-import { Language, TRANSLATIONS } from '../utils/i18n';
-
-interface PWAUpdatePromptProps {
-  lang: Language;
-}
+import { TRANSLATIONS } from '../utils/i18n';
 
 /**
  * Service-worker lifecycle UI:
  * - Shows a reload banner when a new app version is ready (registerType: 'prompt').
  * - Shows a one-time "ready for offline use" toast once precaching completes.
+ *
+ * Fixed to English: system-level browser prompts stay consistent regardless
+ * of the app's content language.
  */
-export const PWAUpdatePrompt: React.FC<PWAUpdatePromptProps> = ({ lang }) => {
-  const t = TRANSLATIONS[lang];
+export const PWAUpdatePrompt: React.FC = () => {
+  const t = TRANSLATIONS.en;
   const {
     offlineReady: [offlineReady, setOfflineReady],
     needRefresh: [needRefresh],

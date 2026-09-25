@@ -495,8 +495,8 @@ export default function App() {
   if (!currentGroup) {
     return (
       <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans transition-colors">
-        <OfflineIndicator lang={lang} />
-        <PWAUpdatePrompt lang={lang} />
+        <OfflineIndicator />
+        <PWAUpdatePrompt />
 
         {toastMessage && (
           <div className="fixed bottom-6 right-6 z-50 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 text-xs font-semibold px-4 py-2.5 rounded-xl shadow-xl border border-neutral-700 dark:border-neutral-300 animate-in fade-in slide-in-from-bottom-2 duration-200">
@@ -554,9 +554,9 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans transition-colors">
       {/* Offline Status Floating Indicator */}
-      <OfflineIndicator lang={lang} />
+      <OfflineIndicator />
       {/* Service Worker update / offline-ready prompts */}
-      <PWAUpdatePrompt lang={lang} />
+      <PWAUpdatePrompt />
 
       {/* Toast Notification */}
       {toastMessage && (

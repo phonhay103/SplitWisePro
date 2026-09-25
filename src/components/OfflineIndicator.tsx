@@ -1,13 +1,9 @@
 import React from 'react';
-import { WifiOff, Database } from 'lucide-react';
+import { WifiOff } from 'lucide-react';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
-import { Language, TRANSLATIONS } from '../utils/i18n';
+import { TRANSLATIONS } from '../utils/i18n';
 
-interface OfflineIndicatorProps {
-  lang: Language;
-}
-
-export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({ lang }) => {
+export const OfflineIndicator: React.FC = () => {
   const isOnline = useOnlineStatus();
 
   if (isOnline) return null;
@@ -20,7 +16,7 @@ export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({ lang }) => {
       </div>
       <div>
         <span>
-          {TRANSLATIONS[lang].offlineToast}
+          {TRANSLATIONS.en.offlineToast}
         </span>
       </div>
     </div>
